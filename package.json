@@ -1,0 +1,15 @@
+{
+  "name": "eecs-3431-a2",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "zip": "zip kyle-schwartz.zip Common kyle.js main.html main.js objects.js README.txt -r0"
+  },
+  "devDependencies": {
+    "vite": "^4.4.5"
+  }
+}
