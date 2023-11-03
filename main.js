@@ -45,6 +45,9 @@ var animFlag = false;
 var prevTime = 0.0;
 var useTextures = 1;
 
+let controller;
+let fpsElement;
+
 const textures = {
   DEFAULT: "missing_texture.webp",
   SAND: "GroundSand005/GroundSand005_COL_1K.jpg",
@@ -329,18 +332,19 @@ window.onload = function init() {
   document.getElementById("view-front").onclick = () => setAll(0, 0, 0);
   document.getElementById("view-front-right").onclick = () => setAll(0, -45, 0);
 
+  fpsElement = document.getElementById("fps");
+
   document.getElementById("animToggleButton").onclick = function () {
-    if (animFlag) {
-      animFlag = false;
-    } else {
-      animFlag = true;
+    if (!animFlag) {
       resetTimerFlag = true;
       window.requestAnimFrame(render);
     }
+    animFlag = !animFlag;
     console.log(animFlag);
 
     controller = new CameraController(canvas);
     controller.onchange = function (xRot, yRot) {
+      animFlag = false;
       RX = xRot;
       RY = yRot;
       window.requestAnimFrame(render);
@@ -349,13 +353,6 @@ window.onload = function init() {
 
   document.getElementById("textureToggleButton").onclick = function () {
     toggleTextures();
-    window.requestAnimFrame(render);
-  };
-
-  var controller = new CameraController(canvas);
-  controller.onchange = function (xRot, yRot) {
-    RX = xRot;
-    RY = yRot;
     window.requestAnimFrame(render);
   };
 
@@ -470,7 +467,7 @@ function gPush() {
 function render() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  eye = vec3(0, 10, 20);
+  eye = vec3(0, 15, 20);
   // eye[1] = eye[1] + 0;
 
   // set the projection matrix
@@ -486,6 +483,9 @@ function render() {
   MS = [];
   modelMatrix = mat4();
 
+  // Spin camera
+  if (animFlag) RY = (TIME * 10) % 360;
+
   // apply the slider rotations
   gRotate(RZ, 0, 0, 1);
   gRotate(RY, 0, 1, 0);
@@ -495,14 +495,16 @@ function render() {
   setAllMatrices();
 
   // get real time
-  var curTime;
   if (animFlag) {
-    curTime = new Date().getTime() / 1000;
+    const curTime = new Date().getTime() / 1000;
     if (resetTimerFlag) {
       prevTime = curTime;
       resetTimerFlag = false;
     }
-    TIME = TIME + curTime - prevTime;
+    const diff = curTime - prevTime;
+    // if (TIME - new Date() > 2)
+    fpsElement.innerText = Math.round(1 / diff);
+    TIME += diff;
     prevTime = curTime;
   }
 
@@ -574,15 +576,6 @@ function render() {
   if (animFlag) window.requestAnimFrame(render);
 }
 
-// A simple camera controller which uses an HTML element as the event
-// source for constructing a view matrix. Assign an "onchange"
-// function to the controller as follows to receive the updated X and
-// Y angles for the camera:
-//
-// var controller = new CameraController(canvas);
-//   controller.onchange = function(xRot, yRot) { ... };
-//
-// The view matrix is computed elsewhere.
 function CameraController(element) {
   var controller = this;
   this.onchange = null;
