@@ -48,7 +48,8 @@ var useTextures = 1;
 const textures = {
   "GroundSand005/GroundSand005_COL_1K.jpg": "sand",
   "BarkPoplar001/BarkPoplar001_COL_1K.jpg": "bark",
-  "GroundGrassGreen002/GroundGrassGreen002_COL_1K.jpg": "water",
+  "GroundGrassGreen002/GroundGrassGreen002_COL_1K.jpg": "grass",
+  "summer-background-sea-water.jpg": "water",
 };
 
 // ------------ Images for textures stuff --------------
@@ -537,7 +538,8 @@ function render() {
     const numLeaves = 5;
     for (let x = 0; x < numLeaves; x++) {
       newCube("#439804", () => {
-        useTexture("water");
+        useTexture("grass");
+        gRotate(Math.cos(TIME + x) * 10, 0, 0, 1);
         gRotate((360 / numLeaves) * x, 0, 1, 0);
         gTranslate(leafLength, 0.5, 0);
         gScale(leafLength, 0, 1);
