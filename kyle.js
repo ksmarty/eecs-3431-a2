@@ -17,6 +17,15 @@ const hex2rgba = (hex) => {
 };
 
 /**
+ * Draws a cylinder along z axis of height 1 centered at the origin and radius 0.5.
+ * Sets the modelview and normal matrices of the global program.
+ */
+function drawTaperedCylinder() {
+  setMV(gl);
+  TaperedCylinder.draw();
+}
+
+/**
  * Base wrapper for drawing objects. Runs push and pop around the function.
  * @param {() => void} fn Function of transformations to apply
  */
@@ -68,6 +77,14 @@ const newCone = (color, fn) => drawObj(color, drawCone, fn);
 const newCylinder = (color, fn) => drawObj(color, drawCylinder, fn);
 
 /**
+ * Draw a new cylinder
+ * @param {string} color Hex code
+ * @param {() => void} fn Function of transformations to apply
+ */
+const newTaperedCylinder = (color, fn) =>
+  drawObj(color, () => drawTaperedCylinder(), fn);
+
+/**
  * Uniformly scale
  * @param {number} factor The scaling factor
  * @returns void
@@ -79,3 +96,65 @@ const gScaleU = (factor) => gScale(factor, factor, factor);
  * @returns {vec3} Current drawing position
  */
 const gPos = () => vec3(...vertices1);
+
+//-------------- Tapered Cylinder --------------
+
+TaperedCylinder = {};
+
+TaperedCylinder.pointsArray = [];
+TaperedCylinder.normalsArray = [];
+TaperedCylinder.colorsArray = [];
+TaperedCylinder.texCoordsArray = [];
+TaperedCylinder.taperAmount = 0.5;
+
+TaperedCylinder.getVertex = function (u, v) {
+  var vd = {};
+  vd.position = vec4(
+    0.5 * (1 - this.taperAmount * v) * Math.cos(u * 2 * Math.PI),
+    0.5 * (1 - this.taperAmount * v) * Math.sin(u * 2 * Math.PI),
+    v - 0.5,
+    1.0
+  );
+  vd.normal = vec3(Math.cos(u * 2 * Math.PI), Math.sin(u * 2 * Math.PI), 0.0);
+  vd.colour = vec4(u, v, 0.0, 1.0);
+  vd.texCoord = vec2(u, v * (1 - this.taperAmount));
+
+  return vd;
+};
+
+TaperedCylinder.init = function (n, program) {
+  this.n = n;
+  if (this.n < 1) return;
+
+  var du = 1.0 / this.n;
+  var dv = du;
+  // do it by quads made up of two triangles
+  for (var u = 0; u < 1.0; u += du) {
+    for (var v = 0; v < 1.0; v += dv) {
+      // make them into triangles
+      var vd1 = this.getVertex(u, v);
+      var vd2 = this.getVertex(u + du, v);
+      var vd3 = this.getVertex(u + du, v + dv);
+      var vd4 = this.getVertex(u, v + dv);
+
+      // Triangle one
+      AddInAttribArrays(this, vd1);
+      AddInAttribArrays(this, vd2);
+      AddInAttribArrays(this, vd3);
+
+      // Triangle two
+      AddInAttribArrays(this, vd3);
+      AddInAttribArrays(this, vd4);
+      AddInAttribArrays(this, vd1);
+    }
+  }
+
+  setBuffers(this, program);
+};
+
+TaperedCylinder.draw = function () {
+  gl.frontFace(gl.CCW);
+
+  setAttribPointers(this);
+  gl.drawArrays(gl.TRIANGLES, 0, this.n * this.n * 6);
+};

@@ -248,6 +248,7 @@ window.onload = function init() {
   Cylinder.init(9, program);
   Cone.init(9, program);
   Sphere.init(36, program);
+  TaperedCylinder.init(9, program);
 
   gl.uniform1i(gl.getUniformLocation(program, "useTextures"), useTextures);
 
@@ -521,7 +522,7 @@ function render() {
   newObj(() => {
     newTaperedCylinder("#795c2e", () => {
       gTranslate(-1, 3, 0);
-      gRotate(90, 1, 0, 0);
+      gRotate(270, 1, 0, 0);
       // gScale(1, 2, 1);
     });
   });
