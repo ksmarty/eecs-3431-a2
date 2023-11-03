@@ -49,6 +49,7 @@ const textures = {
   DEFAULT: "missing_texture.webp",
   SAND: "GroundSand005/GroundSand005_COL_1K.jpg",
   BARK: "BarkPoplar001/BarkPoplar001_COL_1K.jpg",
+  COCONUT: "BarkBrown/bark_brown_01_diff_1k.jpg",
   GRASS: "GroundGrassGreen002/GroundGrassGreen002_COL_1K.jpg",
   WATER: "summer-background-sea-water.jpg",
 };
@@ -538,10 +539,34 @@ function render() {
     const numLeaves = 5;
     for (let x = 0; x < numLeaves; x++) {
       newCube("#439804", textures.GRASS, () => {
-        gRotate(Math.cos(TIME + x) * 10, 0, 0, 1);
+        gRotate(Math.cos(TIME + x) * 10 + 25, 0, 0, 1);
         gRotate((360 / numLeaves) * x, 0, 1, 0);
         gTranslate(leafLength, 0.5, 0);
         gScale(leafLength, 0, 1);
+      });
+    }
+
+    // Coconuts
+    const numCoconuts = 3;
+    for (let x = 0; x < numCoconuts; x++) {
+      newObj(() => {
+        gScaleU(0.75);
+        gTranslate(1 + (x % 2), -0.5 + (x % 2) / 2, x - 1);
+        gRotate(135 + x * 45, 1, 0, 0);
+
+        newSphere("#79513E", textures.COCONUT, () => {});
+        newSphere("#000000", null, () => {
+          gTranslate(0, 0.8, 0.25);
+          gScaleU(0.2);
+        });
+        newSphere("#000000", null, () => {
+          gTranslate(0, 0.8, -0.25);
+          gScaleU(0.2);
+        });
+        newSphere("#000000", null, () => {
+          gTranslate(0.5, 0.7, 0);
+          gScaleU(0.2);
+        });
       });
     }
   });
