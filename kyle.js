@@ -97,8 +97,8 @@ const gScaleU = (factor) => gScale(factor, factor, factor);
  */
 const gPos = () => vec3(...vertices1);
 
-const useTexture = (alias) => {
-  const n = Object.values(textures).indexOf(alias);
+const useTexture = (texture) => {
+  const n = Object.values(textures).indexOf(texture);
   gl.activeTexture(gl[`TEXTURE0`]);
   gl.bindTexture(gl.TEXTURE_2D, textureArray[n].textureWebGL);
   gl.uniform1i(gl.getUniformLocation(program, `texture1`), 0);

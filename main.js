@@ -46,10 +46,11 @@ var prevTime = 0.0;
 var useTextures = 1;
 
 const textures = {
-  "GroundSand005/GroundSand005_COL_1K.jpg": "sand",
-  "BarkPoplar001/BarkPoplar001_COL_1K.jpg": "bark",
-  "GroundGrassGreen002/GroundGrassGreen002_COL_1K.jpg": "grass",
-  "summer-background-sea-water.jpg": "water",
+  DEFAULT: "missing_texture.webp",
+  SAND: "GroundSand005/GroundSand005_COL_1K.jpg",
+  BARK: "BarkPoplar001/BarkPoplar001_COL_1K.jpg",
+  GRASS: "GroundGrassGreen002/GroundGrassGreen002_COL_1K.jpg",
+  WATER: "summer-background-sea-water.jpg",
 };
 
 // ------------ Images for textures stuff --------------
@@ -131,7 +132,7 @@ function loadImageTexture(tex, image) {
 }
 
 function initTextures() {
-  Object.keys(textures).forEach((filename) => {
+  Object.values(textures).forEach((filename) => {
     textureArray.push({});
     loadFileTexture(
       textureArray[textureArray.length - 1],
@@ -506,14 +507,14 @@ function render() {
 
   // Water
   newSphere("#006994", () => {
-    useTexture("water");
+    useTexture(textures.WATER);
     gScale(100, 0.01, 100);
   });
 
   // Island
   newObj(() => {
     newSphere("#c2b280", () => {
-      useTexture("sand");
+      useTexture(textures.SAND);
       gScale(5, 1, 5);
     });
   });
@@ -528,7 +529,7 @@ function render() {
       gRotate(-1 * x, 0, 0, 1);
       gTranslate(-(x / factor) / 2, 1 - x / factor, 0);
       newTaperedCylinder("#795c2e", () => {
-        useTexture("bark");
+        useTexture(textures.BARK);
         gRotate(270, 1, 0, 0);
       });
     }
@@ -538,7 +539,7 @@ function render() {
     const numLeaves = 5;
     for (let x = 0; x < numLeaves; x++) {
       newCube("#439804", () => {
-        useTexture("grass");
+        useTexture(textures.GRASS);
         gRotate(Math.cos(TIME + x) * 10, 0, 0, 1);
         gRotate((360 / numLeaves) * x, 0, 1, 0);
         gTranslate(leafLength, 0.5, 0);
