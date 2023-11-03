@@ -38,12 +38,14 @@ const newObj = (fn) => {
 /**
  * Wrapper for drawing objects
  * @param {string} color Hex code
+ * @param {string} texture Element of `textures` object
  * @param {() => void} drawShape Function that draws an object
  * @param {() => void} fn Function of transformations to apply
  */
-const drawObj = (color, drawShape, fn) =>
+const drawObj = (color, texture, drawShape, fn) =>
   newObj(() => {
     setColor(hex2rgba(color));
+    useTexture(texture ?? textures.DEFAULT);
     fn();
     drawShape();
   });
@@ -51,38 +53,44 @@ const drawObj = (color, drawShape, fn) =>
 /**
  * Draw a new cube
  * @param {string} color Hex code
+ * @param {string} texture Element of `textures` object
  * @param {() => void} fn Function of transformations to apply
  */
-const newCube = (color, fn) => drawObj(color, drawCube, fn);
+const newCube = (color, texture, fn) => drawObj(color, texture, drawCube, fn);
 
 /**
  * Draw a new sphere
  * @param {string} color Hex code
  * @param {() => void} fn Function of transformations to apply
  */
-const newSphere = (color, fn) => drawObj(color, drawSphere, fn);
+const newSphere = (color, texture, fn) =>
+  drawObj(color, texture, drawSphere, fn);
 
 /**
  * Draw a new cone
  * @param {string} color Hex code
+ * @param {string} texture Element of `textures` object
  * @param {() => void} fn Function of transformations to apply
  */
-const newCone = (color, fn) => drawObj(color, drawCone, fn);
+const newCone = (color, texture, fn) => drawObj(color, texture, drawCone, fn);
 
 /**
  * Draw a new cylinder
  * @param {string} color Hex code
+ * @param {string} texture Element of `textures` object
  * @param {() => void} fn Function of transformations to apply
  */
-const newCylinder = (color, fn) => drawObj(color, drawCylinder, fn);
+const newCylinder = (color, texture, fn) =>
+  drawObj(color, texture, drawCylinder, fn);
 
 /**
  * Draw a new cylinder
  * @param {string} color Hex code
+ * @param {string} texture Element of `textures` object
  * @param {() => void} fn Function of transformations to apply
  */
-const newTaperedCylinder = (color, fn) =>
-  drawObj(color, () => drawTaperedCylinder(), fn);
+const newTaperedCylinder = (color, texture, fn) =>
+  drawObj(color, texture, drawTaperedCylinder, fn);
 
 /**
  * Uniformly scale
@@ -97,6 +105,10 @@ const gScaleU = (factor) => gScale(factor, factor, factor);
  */
 const gPos = () => vec3(...vertices1);
 
+/**
+ * Apply texture
+ * @param {string} texture Element of `textures` object
+ */
 const useTexture = (texture) => {
   const n = Object.values(textures).indexOf(texture);
   gl.activeTexture(gl[`TEXTURE0`]);

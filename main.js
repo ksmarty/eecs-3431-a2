@@ -505,16 +505,16 @@ function render() {
     prevTime = curTime;
   }
 
+  // ---------------------------- Drawing ----------------------------
+
   // Water
-  newSphere("#006994", () => {
-    useTexture(textures.WATER);
+  newSphere("#006994", textures.WATER, () => {
     gScale(100, 0.01, 100);
   });
 
   // Island
   newObj(() => {
-    newSphere("#c2b280", () => {
-      useTexture(textures.SAND);
+    newSphere("#c2b280", textures.SAND, () => {
       gScale(5, 1, 5);
     });
   });
@@ -528,8 +528,7 @@ function render() {
       gScaleU(1 - x / factor);
       gRotate(-1 * x, 0, 0, 1);
       gTranslate(-(x / factor) / 2, 1 - x / factor, 0);
-      newTaperedCylinder("#795c2e", () => {
-        useTexture(textures.BARK);
+      newTaperedCylinder("#795c2e", textures.BARK, () => {
         gRotate(270, 1, 0, 0);
       });
     }
@@ -538,8 +537,7 @@ function render() {
     const leafLength = 3;
     const numLeaves = 5;
     for (let x = 0; x < numLeaves; x++) {
-      newCube("#439804", () => {
-        useTexture(textures.GRASS);
+      newCube("#439804", textures.GRASS, () => {
         gRotate(Math.cos(TIME + x) * 10, 0, 0, 1);
         gRotate((360 / numLeaves) * x, 0, 1, 0);
         gTranslate(leafLength, 0.5, 0);
