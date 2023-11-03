@@ -43,7 +43,13 @@ var TIME = 0.0; // Realtime
 var resetTimerFlag = true;
 var animFlag = false;
 var prevTime = 0.0;
-var useTextures = 0;
+var useTextures = 1;
+
+const textures = {
+  "GroundSand005/GroundSand005_COL_1K.jpg": "sand",
+  "BarkPoplar001/BarkPoplar001_COL_1K.jpg": "bark",
+  "GroundGrassGreen002/GroundGrassGreen002_COL_1K.jpg": "water",
+};
 
 // ------------ Images for textures stuff --------------
 var texSize = 64;
@@ -124,14 +130,16 @@ function loadImageTexture(tex, image) {
 }
 
 function initTextures() {
-  textureArray.push({});
-  loadFileTexture(textureArray[textureArray.length - 1], "sunset.bmp");
+  Object.keys(textures).forEach((filename) => {
+    textureArray.push({});
+    loadFileTexture(
+      textureArray[textureArray.length - 1],
+      `textures/${filename}`
+    );
+  });
 
-  textureArray.push({});
-  loadFileTexture(textureArray[textureArray.length - 1], "cubetexture.png");
-
-  textureArray.push({});
-  loadImageTexture(textureArray[textureArray.length - 1], image2);
+  // textureArray.push({});
+  // loadImageTexture(textureArray[textureArray.length - 1], image2);
 }
 
 function handleTextureLoaded(textureObj) {
@@ -233,7 +241,8 @@ window.onload = function init() {
   }
 
   gl.viewport(0, 0, canvas.width, canvas.height);
-  gl.clearColor(0.5, 0.5, 1.0, 1.0);
+  // Skybox colour
+  gl.clearColor(0.529, 0.808, 0.922, 1.0);
 
   gl.enable(gl.DEPTH_TEST);
 
@@ -494,37 +503,46 @@ function render() {
     prevTime = curTime;
   }
 
-  // gl.activeTexture(gl.TEXTURE0);
-  // gl.bindTexture(gl.TEXTURE_2D, textureArray[0].textureWebGL);
-  // gl.uniform1i(gl.getUniformLocation(program, "texture1"), 0);
-
-  // gl.activeTexture(gl.TEXTURE1);
-  // gl.bindTexture(gl.TEXTURE_2D, textureArray[1].textureWebGL);
-  // gl.uniform1i(gl.getUniformLocation(program, "texture2"), 1);
-
-  // gl.activeTexture(gl.TEXTURE2);
-  // gl.bindTexture(gl.TEXTURE_2D, textureArray[2].textureWebGL);
-  // gl.uniform1i(gl.getUniformLocation(program, "texture3"), 2);
-
   // Water
   newSphere("#006994", () => {
+    useTexture("water");
     gScale(100, 0.01, 100);
   });
 
   // Island
   newObj(() => {
     newSphere("#c2b280", () => {
+      useTexture("sand");
       gScale(5, 1, 5);
     });
   });
 
   // Palm Tree
   newObj(() => {
-    newTaperedCylinder("#795c2e", () => {
-      gTranslate(-1, 3, 0);
-      gRotate(270, 1, 0, 0);
-      // gScale(1, 2, 1);
-    });
+    // Trunk
+    gTranslate(-2, 0, 0);
+    for (let x = 1; x <= 9; x++) {
+      const factor = 50;
+      gScaleU(1 - x / factor);
+      gRotate(-1 * x, 0, 0, 1);
+      gTranslate(-(x / factor) / 2, 1 - x / factor, 0);
+      newTaperedCylinder("#795c2e", () => {
+        useTexture("bark");
+        gRotate(270, 1, 0, 0);
+      });
+    }
+
+    // Leaves
+    const leafLength = 3;
+    const numLeaves = 5;
+    for (let x = 0; x < numLeaves; x++) {
+      newCube("#439804", () => {
+        useTexture("water");
+        gRotate((360 / numLeaves) * x, 0, 1, 0);
+        gTranslate(leafLength, 0.5, 0);
+        gScale(leafLength, 0, 1);
+      });
+    }
   });
 
   if (animFlag) window.requestAnimFrame(render);
