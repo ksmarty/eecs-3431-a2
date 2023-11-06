@@ -1,154 +1,124 @@
 // Template code for A2 Fall 2021 -- DO NOT DELETE THIS LINE
 
-var canvas;
-var gl;
+"use strict";
 
-var program;
+/**
+ * @type {WebGLRenderingContext}
+ */
+let gl;
 
-var near = 1;
-var far = 100;
+/**
+ * @type {WebGLProgram}
+ */
+let program;
 
-var left = -6.0;
-var right = 6.0;
-var ytop = 6.0;
-var bottom = -6.0;
+const near = 1;
+const far = 100;
 
-var lightPosition2 = vec4(100.0, 100.0, 100.0, 1.0);
-var lightPosition = vec4(0.0, 0.0, 100.0, 1.0);
+// Ortho consts
+// const left = -6.0;
+// const right = 6.0;
+// const ytop = 6.0;
+// const bottom = -6.0;
 
-var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
-var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
-var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);
+// const lightPosition2 = vec4(100.0, 100.0, 100.0, 1.0);
+const lightPosition = vec4(0.0, 0.0, 100.0, 1.0);
 
-var materialAmbient = vec4(1.0, 0.0, 1.0, 1.0);
-var materialDiffuse = vec4(1.0, 0.8, 0.0, 1.0);
-var materialSpecular = vec4(0.4, 0.4, 0.4, 1.0);
-var materialShininess = 30.0;
+const defaultLight = {
+  ambient: vec4(0.2, 0.2, 0.2, 1.0),
+  diffuse: vec4(1.0, 1.0, 1.0, 1.0),
+  specular: vec4(1.0, 1.0, 1.0, 1.0),
+};
 
-var ambientColor, diffuseColor, specularColor;
+const defaultMaterial = {
+  diffuse: vec4(1.0, 0.8, 0.0, 1.0),
+  specular: vec4(0.4, 0.4, 0.4, 1.0),
+  shininess: 30.0,
+};
 
-var modelMatrix, viewMatrix;
-var modelViewMatrix, projectionMatrix, normalMatrix;
-var modelViewMatrixLoc, projectionMatrixLoc, normalMatrixLoc;
-var eye;
-var at = vec3(0.0, 0.0, 0.0);
-var up = vec3(0.0, 1.0, 0.0);
+// var ambientColor, diffuseColor, specularColor;
 
-var RX = 0;
-var RY = 0;
-var RZ = 0;
+let modelMatrix, viewMatrix;
+let modelViewMatrix, projectionMatrix, normalMatrix;
+let modelViewMatrixLoc, projectionMatrixLoc, normalMatrixLoc;
 
-var MS = []; // The modeling matrix stack
-var TIME = 0.0; // Realtime
-var resetTimerFlag = true;
-var animFlag = false;
-var prevTime = 0.0;
-var useTextures = 1;
+/**
+ * Camera rotations
+ */
+let Rotations = {
+  x: 0,
+  y: 0,
+  z: 0,
+};
+
+let MS = []; // The modeling matrix stack
+let TIME = 0.0; // Realtime
+let resetTimerFlag = true;
+let animFlag = false;
+let prevTime = 0.0;
+let useTextures = 1;
 
 let controller;
 let fpsElement;
 
+/**
+ * @typedef {string} TextureFile
+ */
+
+/**
+ * List of texture files
+ * @readonly
+ * @enum {TextureFile}
+ */
 const textures = {
   DEFAULT: "missing_texture.webp",
+  BLANK: "Blank.png",
   SAND: "GroundSand005/GroundSand005_COL_1K.jpg",
   BARK: "BarkPoplar001/BarkPoplar001_COL_1K.jpg",
   COCONUT: "BarkBrown/bark_brown_01_diff_1k.jpg",
   GRASS: "GroundGrassGreen002/GroundGrassGreen002_COL_1K.jpg",
   WATER: "summer-background-sea-water.jpg",
+  CHAIR_WOOD: "WoodCabinetWornLong/wood_cabinet_worn_long_diff_1k.jpg",
+  COTTON: "TowelCotton001/TowelCotton001_COL_1K.png",
 };
 
-// ------------ Images for textures stuff --------------
-var texSize = 64;
+/**
+ * @typedef Texture
+ * @type {Object}
+ * @property {WebGLTexture} textureWebGL - The WebGL texture
+ * @property {boolean} isTextureReady Flag to tell if texture is ready
+ * @property {HTMLImageElement} image The texture image
+ */
 
-var image1 = new Array();
-for (var i = 0; i < texSize; i++) image1[i] = new Array();
-for (var i = 0; i < texSize; i++)
-  for (var j = 0; j < texSize; j++) image1[i][j] = new Float32Array(4);
-for (var i = 0; i < texSize; i++)
-  for (var j = 0; j < texSize; j++) {
-    var c = ((i & 0x8) == 0) ^ ((j & 0x8) == 0);
-    image1[i][j] = [c, c, c, 1];
-  }
+/**
+ * Array of all the textures used in the program
+ * @type {Texture[]}
+ */
+let textureArray = [];
 
-// Convert floats to ubytes for texture
+const initTextures = () =>
+  (textureArray = Object.values(textures).reduce(
+    (arr, filename, i) => [
+      ...arr,
+      {
+        textureWebGL: gl.createTexture(),
+        isTextureReady: false,
+        image: (() => {
+          const image = new Image();
+          image.src = `textures/${filename}`;
+          image.onload = () => handleTextureLoaded(textureArray[i]);
+          return image;
+        })(),
+      },
+    ],
+    []
+  ));
 
-var image2 = new Uint8Array(4 * texSize * texSize);
-
-for (var i = 0; i < texSize; i++)
-  for (var j = 0; j < texSize; j++)
-    for (var k = 0; k < 4; k++)
-      image2[4 * texSize * i + 4 * j + k] = 255 * image1[i][j][k];
-
-var textureArray = [];
-
-function isLoaded(im) {
-  if (im.complete) {
-    console.log("loaded");
-    return true;
-  } else {
-    console.log("still not loaded!!!!");
-    return false;
-  }
-}
-
-function loadFileTexture(tex, filename) {
-  tex.textureWebGL = gl.createTexture();
-  tex.image = new Image();
-  tex.image.src = filename;
-  tex.isTextureReady = false;
-  tex.image.onload = function () {
-    handleTextureLoaded(tex);
-  };
-  // The image is going to be loaded asyncronously (lazy) which could be
-  // after the program continues to the next functions. OUCH!
-}
-
-function loadImageTexture(tex, image) {
-  tex.textureWebGL = gl.createTexture();
-  tex.image = new Image();
-  //tex.image.src = "CheckerBoard-from-Memory" ;
-
-  gl.bindTexture(gl.TEXTURE_2D, tex.textureWebGL);
-  //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.RGBA,
-    texSize,
-    texSize,
-    0,
-    gl.RGBA,
-    gl.UNSIGNED_BYTE,
-    image
-  );
-  gl.generateMipmap(gl.TEXTURE_2D);
-  gl.texParameteri(
-    gl.TEXTURE_2D,
-    gl.TEXTURE_MIN_FILTER,
-    gl.NEAREST_MIPMAP_LINEAR
-  );
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); //Prevents s-coordinate wrapping (repeating)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); //Prevents t-coordinate wrapping (repeating)
-  gl.bindTexture(gl.TEXTURE_2D, null);
-
-  tex.isTextureReady = true;
-}
-
-function initTextures() {
-  Object.values(textures).forEach((filename) => {
-    textureArray.push({});
-    loadFileTexture(
-      textureArray[textureArray.length - 1],
-      `textures/${filename}`
-    );
-  });
-
-  // textureArray.push({});
-  // loadImageTexture(textureArray[textureArray.length - 1], image2);
-}
-
-function handleTextureLoaded(textureObj) {
+/**
+ * Handle the texture once the image has been loaded
+ * @param {Texture} textureObj
+ */
+const handleTextureLoaded = (textureObj) => {
   gl.bindTexture(gl.TEXTURE_2D, textureObj.textureWebGL);
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); // otherwise the image would be flipped upsdide down
   gl.texImage2D(
@@ -166,80 +136,59 @@ function handleTextureLoaded(textureObj) {
     gl.LINEAR_MIPMAP_NEAREST
   );
   gl.generateMipmap(gl.TEXTURE_2D);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); //Prevents s-coordinate wrapping (repeating)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); //Prevents t-coordinate wrapping (repeating)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT); //Prevents s-coordinate wrapping (repeating)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT); //Prevents t-coordinate wrapping (repeating)
   gl.bindTexture(gl.TEXTURE_2D, null);
   console.log(textureObj.image.src);
 
   textureObj.isTextureReady = true;
-}
+};
 
 //----------------------------------------------------------------
 
 function setColor(c) {
-  ambientProduct = mult(lightAmbient, c);
-  diffuseProduct = mult(lightDiffuse, c);
-  specularProduct = mult(lightSpecular, materialSpecular);
+  const ambientProduct = mult(defaultLight.ambient, c);
+  const diffuseProduct = mult(defaultLight.diffuse, c);
+  const specularProduct = mult(defaultLight.specular, defaultMaterial.specular);
 
+  gl.uniform4fv(getUniformLocation("ambientProduct"), flatten(ambientProduct));
+  gl.uniform4fv(getUniformLocation("diffuseProduct"), flatten(diffuseProduct));
   gl.uniform4fv(
-    gl.getUniformLocation(program, "ambientProduct"),
-    flatten(ambientProduct)
-  );
-  gl.uniform4fv(
-    gl.getUniformLocation(program, "diffuseProduct"),
-    flatten(diffuseProduct)
-  );
-  gl.uniform4fv(
-    gl.getUniformLocation(program, "specularProduct"),
+    getUniformLocation("specularProduct"),
     flatten(specularProduct)
   );
-  gl.uniform4fv(
-    gl.getUniformLocation(program, "lightPosition"),
-    flatten(lightPosition)
-  );
-  gl.uniform1f(gl.getUniformLocation(program, "shininess"), materialShininess);
+  gl.uniform4fv(getUniformLocation("lightPosition"), flatten(lightPosition));
+  gl.uniform1f(getUniformLocation("shininess"), defaultMaterial.shininess);
 }
 
-function toggleTextures() {
-  useTextures = 1 - useTextures;
-  gl.uniform1i(gl.getUniformLocation(program, "useTextures"), useTextures);
-}
+const toggleTextures = () => {
+  useTextures = !useTextures;
+  gl.uniform1i(getUniformLocation("useTextures"), useTextures);
+};
 
-function waitForTextures1(tex) {
-  setTimeout(function () {
-    console.log("Waiting for: " + tex.image.src);
-    wtime = new Date().getTime();
-    if (!tex.isTextureReady) {
-      console.log(wtime + " not ready yet");
-      waitForTextures1(tex);
-    } else {
+/**
+ * Takes an array of textures and calls render if the textures are created
+ * @param {Texture[]} texs Array of textures
+ */
+const waitForTextures = (texs) => {
+  setTimeout(() => {
+    const fullyLoaded = texs.every(({ image: { src }, isTextureReady }) => {
+      console.log("boo" + src);
+      return isTextureReady;
+    }, 0);
+
+    if (fullyLoaded) {
       console.log("ready to render");
       window.requestAnimFrame(render);
-    }
-  }, 5);
-}
-
-// Takes an array of textures and calls render if the textures are created
-function waitForTextures(texs) {
-  setTimeout(function () {
-    var n = 0;
-    for (var i = 0; i < texs.length; i++) {
-      console.log("boo" + texs[i].image.src);
-      n = n + texs[i].isTextureReady;
-    }
-    wtime = new Date().getTime();
-    if (n != texs.length) {
-      console.log(wtime + " not ready yet");
+    } else {
+      console.log(new Date().getTime() + " not ready yet");
       waitForTextures(texs);
-    } else {
-      console.log("ready to render");
-      window.requestAnimFrame(render);
     }
-  }, 5);
-}
+  }, 0);
+};
 
 window.onload = function init() {
-  canvas = document.getElementById("gl-canvas");
+  const canvas = document.getElementById("gl-canvas");
 
   gl = WebGLUtils.setupWebGL(canvas);
   if (!gl) {
@@ -265,31 +214,31 @@ window.onload = function init() {
   Sphere.init(36, program);
   TaperedCylinder.init(9, program);
 
-  gl.uniform1i(gl.getUniformLocation(program, "useTextures"), useTextures);
+  gl.uniform1i(getUniformLocation("useTextures"), useTextures);
 
   // record the locations of the matrices that are used in the shaders
-  modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
-  normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
-  projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
+  modelViewMatrixLoc = getUniformLocation("modelViewMatrix");
+  normalMatrixLoc = getUniformLocation("normalMatrix");
+  projectionMatrixLoc = getUniformLocation("projectionMatrix");
 
   // set a default material
-  setColor(materialDiffuse);
+  setColor(defaultMaterial.diffuse);
 
   const sliderX = document.getElementById("sliderXi");
   sliderX.oninput = function () {
-    RX = this.value;
+    Rotations.x = this.value;
     window.requestAnimFrame(render);
   };
 
   const sliderY = document.getElementById("sliderYi");
   sliderY.oninput = function () {
-    RY = this.value;
+    Rotations.y = this.value;
     window.requestAnimFrame(render);
   };
 
   const sliderZ = document.getElementById("sliderZi");
   sliderZ.oninput = function () {
-    RZ = this.value;
+    Rotations.z = this.value;
     window.requestAnimFrame(render);
   };
 
@@ -341,14 +290,14 @@ window.onload = function init() {
     }
     animFlag = !animFlag;
     console.log(animFlag);
+  };
 
-    controller = new CameraController(canvas);
-    controller.onchange = function (xRot, yRot) {
-      animFlag = false;
-      RX = xRot;
-      RY = yRot;
-      window.requestAnimFrame(render);
-    };
+  controller = new CameraController(canvas);
+  controller.onchange = function (xRot, yRot) {
+    animFlag = false;
+    Rotations.x = xRot;
+    Rotations.y = yRot;
+    window.requestAnimFrame(render);
   };
 
   document.getElementById("textureToggleButton").onclick = function () {
@@ -467,14 +416,14 @@ function gPush() {
 function render() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  eye = vec3(0, 15, 20);
-  // eye[1] = eye[1] + 0;
+  const eye = vec3(-2, 4, 6);
 
   // set the projection matrix
   projectionMatrix = perspective(45, 1, near, far);
   // projectionMatrix = ortho(left, right, bottom, ytop, near, far);
 
-  at = vec3(0, 0, 0);
+  const at = vec3(2, 0, -4);
+  const up = vec3(0.0, 1.0, 0.0);
 
   // set the camera matrix
   viewMatrix = lookAt(eye, at, up);
@@ -484,12 +433,12 @@ function render() {
   modelMatrix = mat4();
 
   // Spin camera
-  if (animFlag) RY = (TIME * 10) % 360;
+  if (animFlag) Rotations.y = (TIME * 10) % 360;
 
   // apply the slider rotations
-  gRotate(RZ, 0, 0, 1);
-  gRotate(RY, 0, 1, 0);
-  gRotate(RX, 1, 0, 0);
+  gRotate(Rotations.x, 0, 0, 1);
+  gRotate(Rotations.y, 0, 1, 0);
+  gRotate(Rotations.z, 1, 0, 0);
 
   // send all the matrices to the shaders
   setAllMatrices();
@@ -502,8 +451,7 @@ function render() {
       resetTimerFlag = false;
     }
     const diff = curTime - prevTime;
-    // if (TIME - new Date() > 2)
-    fpsElement.innerText = Math.round(1 / diff);
+    if (diff) fpsElement.innerText = Math.round(1 / diff);
     TIME += diff;
     prevTime = curTime;
   }
@@ -511,8 +459,10 @@ function render() {
   // ---------------------------- Drawing ----------------------------
 
   // Water
-  newSphere("#006994", textures.WATER, () => {
-    gScale(100, 0.01, 100);
+  newObj(() => {
+    newSphere("#006994", textures.WATER, () => {
+      gScale(100, 0.01, 100);
+    });
   });
 
   // Island
@@ -571,6 +521,67 @@ function render() {
         });
       });
     }
+  });
+
+  // Beach chair
+  newObj(() => {
+    gScaleU(0.5);
+    gTranslate(1, 3.8, 0);
+
+    // Top Fabric
+    newCube("#017fbd", textures.COTTON, () => {
+      gTranslate(0, 0, -2);
+      gRotate(45, 1, 0, 0);
+      gScale(1, 0.02, 1.5);
+    });
+    // Bottom Fabric
+    newCube("#017fbd", textures.COTTON, () => {
+      gTranslate(0, -1, 1);
+      gScale(1, 0.02, 2);
+    });
+
+    // Wood Supports
+    const woodSupport = (fn) => newCylinder("#a48205", textures.CHAIR_WOOD, fn);
+    [-1, 1].forEach((e) => {
+      newObj(() => {
+        gTranslate(e, 0, 0);
+        // Bottom Bar
+        woodSupport(() => {
+          gTranslate(0, -1, 1);
+          gScale(0.2, 0.2, 4);
+        });
+        // Back Bar
+        woodSupport(() => {
+          gTranslate(0, 0, -2);
+          gRotate(45, 1, 0, 0);
+          gScale(0.2, 0.2, 3);
+        });
+        // Back Leg
+        woodSupport(() => {
+          gTranslate(0, -1.5, -1.5);
+          gRotate(135, 1, 0, 0);
+          gScale(0.2, 0.2, 1.5);
+        });
+        // Front Leg
+        woodSupport(() => {
+          gTranslate(0, -1.5, 3.5);
+          gRotate(45, 1, 0, 0);
+          gScale(0.2, 0.2, 1.5);
+        });
+        // Head Bar
+        woodSupport(() => {
+          gRotate(90, 0, 1, 0);
+          gTranslate(3, 1, -e / 2);
+          gScale(0.2, 0.2, 1);
+        });
+        // Foot Bar
+        woodSupport(() => {
+          gRotate(90, 0, 1, 0);
+          gTranslate(-3, -1, -e / 2);
+          gScale(0.2, 0.2, 1);
+        });
+      });
+    });
   });
 
   if (animFlag) window.requestAnimFrame(render);

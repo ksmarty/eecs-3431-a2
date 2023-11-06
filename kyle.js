@@ -38,7 +38,7 @@ const newObj = (fn) => {
 /**
  * Wrapper for drawing objects
  * @param {string} color Hex code
- * @param {string} texture Element of `textures` object
+ * @param {TextureFile} texture Element of `textures` object
  * @param {() => void} drawShape Function that draws an object
  * @param {() => void} fn Function of transformations to apply
  */
@@ -53,7 +53,7 @@ const drawObj = (color, texture, drawShape, fn) =>
 /**
  * Draw a new cube
  * @param {string} color Hex code
- * @param {string} texture Element of `textures` object
+ * @param {TextureFile} texture Element of `textures` object
  * @param {() => void} fn Function of transformations to apply
  */
 const newCube = (color, texture, fn) => drawObj(color, texture, drawCube, fn);
@@ -61,6 +61,7 @@ const newCube = (color, texture, fn) => drawObj(color, texture, drawCube, fn);
 /**
  * Draw a new sphere
  * @param {string} color Hex code
+ * @param {TextureFile} texture Element of `textures` object
  * @param {() => void} fn Function of transformations to apply
  */
 const newSphere = (color, texture, fn) =>
@@ -69,7 +70,7 @@ const newSphere = (color, texture, fn) =>
 /**
  * Draw a new cone
  * @param {string} color Hex code
- * @param {string} texture Element of `textures` object
+ * @param {TextureFile} texture Element of `textures` object
  * @param {() => void} fn Function of transformations to apply
  */
 const newCone = (color, texture, fn) => drawObj(color, texture, drawCone, fn);
@@ -77,7 +78,7 @@ const newCone = (color, texture, fn) => drawObj(color, texture, drawCone, fn);
 /**
  * Draw a new cylinder
  * @param {string} color Hex code
- * @param {string} texture Element of `textures` object
+ * @param {TextureFile} texture Element of `textures` object
  * @param {() => void} fn Function of transformations to apply
  */
 const newCylinder = (color, texture, fn) =>
@@ -86,7 +87,7 @@ const newCylinder = (color, texture, fn) =>
 /**
  * Draw a new cylinder
  * @param {string} color Hex code
- * @param {string} texture Element of `textures` object
+ * @param {TextureFile} texture Element of `textures` object
  * @param {() => void} fn Function of transformations to apply
  */
 const newTaperedCylinder = (color, texture, fn) =>
@@ -107,73 +108,102 @@ const gPos = () => vec3(...vertices1);
 
 /**
  * Apply texture
- * @param {string} texture Element of `textures` object
+ * @param {TextureFile} texture Element of `textures` object
+ * @param {number} unit Shader unit to use for multiple textures
  */
-const useTexture = (texture) => {
+const useTexture = (texture, unit = 0) => {
   const n = Object.values(textures).indexOf(texture);
-  gl.activeTexture(gl[`TEXTURE0`]);
+  gl.activeTexture(gl[`TEXTURE${unit}`]);
   gl.bindTexture(gl.TEXTURE_2D, textureArray[n].textureWebGL);
-  gl.uniform1i(gl.getUniformLocation(program, `texture1`), 0);
+  gl.uniform1i(getUniformLocation(`texture${n}`), unit);
+};
+
+/**
+ * Wrapper for the WebGL method of the same name
+ * @param {string} name
+ */
+const getUniformLocation = (name) => {
+  return gl.getUniformLocation(program, name);
+};
+
+const blankTexture = () => {
+  const width = 1;
+  const height = 1;
+  const x = ((Math.cos(TIME) + 1) / 2) * 255;
+  const whitePixelData = new Uint8Array([x, x, x, 0]);
+
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    0,
+    gl.RGBA,
+    width,
+    height,
+    0,
+    gl.RGBA,
+    gl.UNSIGNED_BYTE,
+    whitePixelData
+  );
+  return texture;
 };
 
 //-------------- Tapered Cylinder --------------
 
-TaperedCylinder = {};
+const TaperedCylinder = {
+  pointsArray: [],
+  normalsArray: [],
+  colorsArray: [],
+  texCoordsArray: [],
 
-TaperedCylinder.pointsArray = [];
-TaperedCylinder.normalsArray = [];
-TaperedCylinder.colorsArray = [];
-TaperedCylinder.texCoordsArray = [];
-TaperedCylinder.taperAmount = 0.2;
+  taperAmount: 0.2,
 
-TaperedCylinder.getVertex = function (u, v) {
-  var vd = {};
-  vd.position = vec4(
-    0.5 * (1 - this.taperAmount * v) * Math.cos(u * 2 * Math.PI),
-    0.5 * (1 - this.taperAmount * v) * Math.sin(u * 2 * Math.PI),
-    v - 0.5,
-    1.0
-  );
-  vd.normal = vec3(Math.cos(u * 2 * Math.PI), Math.sin(u * 2 * Math.PI), 0.0);
-  vd.colour = vec4(u, v, 0.0, 1.0);
-  vd.texCoord = vec2(u, v * (1 - this.taperAmount));
+  getVertex(u, v) {
+    return {
+      position: vec4(
+        0.5 * (1 - this.taperAmount * v) * Math.cos(u * 2 * Math.PI),
+        0.5 * (1 - this.taperAmount * v) * Math.sin(u * 2 * Math.PI),
+        v - 0.5,
+        1.0
+      ),
+      normal: vec3(Math.cos(u * 2 * Math.PI), Math.sin(u * 2 * Math.PI), 0.0),
+      colour: vec4(u, v, 0.0, 1.0),
+      texCoord: vec2(u, v * (1 - this.taperAmount)),
+    };
+  },
 
-  return vd;
-};
+  init(n, program) {
+    this.n = n;
+    if (this.n < 1) return;
 
-TaperedCylinder.init = function (n, program) {
-  this.n = n;
-  if (this.n < 1) return;
+    var du = 1.0 / this.n;
+    var dv = du;
+    // do it by quads made up of two triangles
+    for (var u = 0; u < 1.0; u += du) {
+      for (var v = 0; v < 1.0; v += dv) {
+        // make them into triangles
+        var vd1 = this.getVertex(u, v);
+        var vd2 = this.getVertex(u + du, v);
+        var vd3 = this.getVertex(u + du, v + dv);
+        var vd4 = this.getVertex(u, v + dv);
 
-  var du = 1.0 / this.n;
-  var dv = du;
-  // do it by quads made up of two triangles
-  for (var u = 0; u < 1.0; u += du) {
-    for (var v = 0; v < 1.0; v += dv) {
-      // make them into triangles
-      var vd1 = this.getVertex(u, v);
-      var vd2 = this.getVertex(u + du, v);
-      var vd3 = this.getVertex(u + du, v + dv);
-      var vd4 = this.getVertex(u, v + dv);
-
-      // Triangle one
-      AddInAttribArrays(this, vd1);
-      AddInAttribArrays(this, vd2);
-      AddInAttribArrays(this, vd3);
-
-      // Triangle two
-      AddInAttribArrays(this, vd3);
-      AddInAttribArrays(this, vd4);
-      AddInAttribArrays(this, vd1);
+        // Triangle one
+        [vd1, vd2, vd3].forEach((e) => AddInAttribArrays(this, e));
+        // Triangle two
+        [vd3, vd4, vd1].forEach((e) => AddInAttribArrays(this, e));
+      }
     }
-  }
 
-  setBuffers(this, program);
-};
+    setBuffers(this, program);
+  },
 
-TaperedCylinder.draw = function () {
-  gl.frontFace(gl.CCW);
-
-  setAttribPointers(this);
-  gl.drawArrays(gl.TRIANGLES, 0, this.n * this.n * 6);
+  draw() {
+    gl.frontFace(gl.CCW);
+    setAttribPointers(this);
+    gl.drawArrays(gl.TRIANGLES, 0, this.n * this.n * 6);
+  },
 };
