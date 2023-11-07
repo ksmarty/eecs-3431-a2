@@ -80,6 +80,10 @@ const textures = {
   WATER: "summer-background-sea-water.jpg",
   CHAIR_WOOD: "WoodCabinetWornLong/wood_cabinet_worn_long_diff_1k.jpg",
   COTTON: "TowelCotton001/TowelCotton001_COL_1K.png",
+  SKIN: "human_skin_5-1K/1K-human_skin_5_diffuseOriginal.jpg",
+  DENIM: "denmin_fabric_02_1k/denmin_fabric_02_diff_1k.jpg",
+  FLOWERS: "fabric_154-1K/fabric_154_basecolor-1K.png",
+  SQUIRRELS: "fabric_155-1K/fabric_155_basecolor-1K.png",
 };
 
 /**
@@ -416,7 +420,7 @@ function gPush() {
 function render() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  const eye = vec3(-2, 4, 6);
+  const eye = vec3(0, 3, 3);
 
   // set the projection matrix
   projectionMatrix = perspective(45, 1, near, far);
@@ -529,13 +533,13 @@ function render() {
     gTranslate(1, 3.8, 0);
 
     // Top Fabric
-    newCube("#017fbd", textures.COTTON, () => {
+    newCube("#017fbd", textures.FLOWERS, () => {
       gTranslate(0, 0, -2);
       gRotate(45, 1, 0, 0);
       gScale(1, 0.02, 1.5);
     });
     // Bottom Fabric
-    newCube("#017fbd", textures.COTTON, () => {
+    newCube("#017fbd", textures.FLOWERS, () => {
       gTranslate(0, -1, 1);
       gScale(1, 0.02, 2);
     });
@@ -548,13 +552,19 @@ function render() {
         // Bottom Bar
         woodSupport(() => {
           gTranslate(0, -1, 1);
-          gScale(0.2, 0.2, 4);
+          gScale(0.2, 0.2, 4.1);
         });
         // Back Bar
         woodSupport(() => {
           gTranslate(0, 0, -2);
           gRotate(45, 1, 0, 0);
           gScale(0.2, 0.2, 3);
+        });
+        // Back Bar Caps
+        newSphere("#a48205", textures.CHAIR_WOOD, () => {
+          gTranslate(0, 1.025, -3.025);
+          gRotate(45, 1, 0, 0);
+          gScaleU(0.1);
         });
         // Back Leg
         woodSupport(() => {
@@ -581,6 +591,72 @@ function render() {
           gScale(0.2, 0.2, 1);
         });
       });
+    });
+  });
+
+  // Steve
+  newObj(() => {
+    gScaleU(0.5);
+    gTranslate(1, 4, 0);
+
+    // Shirt
+    newCylinder("#a3806d", textures.SQUIRRELS, () => {
+      gTranslate(0, -0.3, -1.1);
+      gRotate(-135, 1, 0, 0);
+
+      const shorts = ["#2f5060", textures.DENIM];
+
+      // Hips
+      newCylinder(...shorts, () => {
+        gRotate(135, 1, 0, 0);
+        gTranslate(0, -0.5, 0.75);
+
+        // Crotch cover
+        newSphere(...shorts, () => {
+          gScale(0.6, 0.25, 0.1);
+        });
+
+        // Legs - Top
+        [-1, 1].forEach((e) => {
+          newTaperedCylinder(...shorts, () => {
+            gTranslate(e / 3, 0, 0.85);
+
+            // Legs - Bottom
+            const skin = ["#a3806d", textures.SKIN];
+            newTaperedCylinder(...skin, () => {
+              gTranslate(0, 0, 1);
+
+              // Feet
+              newSphere(...skin, () => {
+                gTranslate(0, 0.15, 0.65);
+                gRotate(15, 1, 0, -e);
+
+                // Toes
+                [1.75, 1, 1, 1, 1].forEach((t, i) => {
+                  newSphere(...skin, () => {
+                    gTranslate(
+                      (e * (i - t)) / 25,
+                      0.35 - Math.tan(i / 3) / 60,
+                      0.02
+                    );
+                    gScale(0.025 * t, 0.035 * t, 0.03);
+                  });
+                });
+
+                gScale(0.175, 0.35, 0.1);
+              });
+
+              gScale(0.4, 0.3, 1.25);
+            });
+
+            gScale(0.75, 0.4, 1.25);
+          });
+        });
+
+        gScale(1.49, 0.5, 0.5);
+      });
+
+      gScale(1.5, 1, 1.5);
     });
   });
 

@@ -20,10 +20,10 @@ const hex2rgba = (hex) => {
  * Draws a cylinder along z axis of height 1 centered at the origin and radius 0.5.
  * Sets the modelview and normal matrices of the global program.
  */
-function drawTaperedCylinder() {
+const drawTaperedCylinder = () => {
   setMV(gl);
   TaperedCylinder.draw();
-}
+};
 
 /**
  * Base wrapper for drawing objects. Runs push and pop around the function.
@@ -44,9 +44,9 @@ const newObj = (fn) => {
  */
 const drawObj = (color, texture, drawShape, fn) =>
   newObj(() => {
+    fn();
     if (useTextures) useTexture(texture ?? textures.DEFAULT);
     else setColor(hex2rgba(color));
-    fn();
     drawShape();
   });
 
