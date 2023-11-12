@@ -599,10 +599,43 @@ function render() {
     gScaleU(0.5);
     gTranslate(1, 4, 0);
 
+    const skin = ["#a3806d", textures.SKIN];
+
     // Shirt
-    newCylinder("#a3806d", textures.SQUIRRELS, () => {
+    const shirt = ["#a3806d", textures.SQUIRRELS];
+    newTaperedCylinder(...shirt, () => {
       gTranslate(0, -0.3, -1.1);
       gRotate(-135, 1, 0, 0);
+
+      // Shirt
+      newTaperedCylinder(...shirt, () => {
+        gTranslate(0, 0, 0.8);
+
+        // Neck
+        newTaperedCylinder(...skin, () => {
+          gTranslate(0, 0, 0.2);
+          gScale(1, 0.65, 0.25);
+        });
+
+        // Sleeves
+        [-1, 1].forEach((e) => {
+          newTaperedCylinder(...shirt, () => {
+            gRotate(90, 0, e, 0);
+            gTranslate(e * 0.4, 0, 0.65);
+            gRotate(35, 0, e, 0);
+
+            gScale(0.5, 0.5, 0.75);
+          });
+        });
+
+        gScale(1.2, 0.85, 0.25);
+      });
+
+      // Head;
+      newSphere(...skin, () => {
+        gTranslate(0, 0, 1.5);
+        gScale(0.5, 0.5, 0.6);
+      });
 
       const shorts = ["#2f5060", textures.DENIM];
 
@@ -622,7 +655,6 @@ function render() {
             gTranslate(e / 3, 0, 0.85);
 
             // Legs - Bottom
-            const skin = ["#a3806d", textures.SKIN];
             newTaperedCylinder(...skin, () => {
               gTranslate(0, 0, 1);
 
