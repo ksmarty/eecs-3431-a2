@@ -420,7 +420,7 @@ function gPush() {
 function render() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  const eye = vec3(0, 3, 3);
+  const eye = vec3(-0.5, 3, 3);
 
   // set the projection matrix
   projectionMatrix = perspective(45, 1, near, far);
@@ -437,7 +437,7 @@ function render() {
   modelMatrix = mat4();
 
   // Spin camera
-  if (animFlag) Rotations.y = (TIME * 10) % 360;
+  // if (animFlag) Rotations.y = (TIME * 10) % 360;
 
   // apply the slider rotations
   gRotate(Rotations.x, 0, 0, 1);
@@ -617,12 +617,41 @@ function render() {
           gScale(1, 0.65, 0.25);
         });
 
-        // Sleeves
+        // Arms
         [-1, 1].forEach((e) => {
+          // Sleeves
           newTaperedCylinder(...shirt, () => {
+            // Don't touch
             gRotate(90, 0, e, 0);
-            gTranslate(e * 0.4, 0, 0.65);
-            gRotate(35, 0, e, 0);
+            gTranslate(e * 0.4, 0, 0.35);
+
+            // Move Upper arm
+            gRotate(45, (Math.cos(TIME) + 1) / 2, e, 0);
+
+            // Don't touch
+            gTranslate(0, 0, 0.5);
+
+            // Upper arm
+            newTaperedCylinder(...skin, () => {
+              gTranslate(0, 0, 0.5);
+
+              // Elbow
+              newSphere(...skin, () => {
+                gTranslate(0, 0, 0.25);
+
+                // Forearm
+                newTaperedCylinder("...skin", textures.DEFAULT, () => {
+                  gRotate(60 + Math.cos(TIME) * 30, 1, e, 0);
+                  gTranslate(0, 0, 0.5);
+
+                  gScale(0.3, 0.3, 1);
+                });
+
+                gScaleU(0.14);
+              });
+
+              gScale(0.35, 0.4, 0.5);
+            });
 
             gScale(0.5, 0.5, 0.75);
           });
