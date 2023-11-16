@@ -420,7 +420,7 @@ function gPush() {
 function render() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  const eye = vec3(-0.5, 3, 3);
+  const eye = vec3(-5, 6, 7);
 
   // set the projection matrix
   projectionMatrix = perspective(45, 1, near, far);
@@ -479,52 +479,58 @@ function render() {
   // Palm Tree
   newObj(() => {
     // Trunk
-    gTranslate(-2, 0, 0);
-    for (let x = 1; x <= 9; x++) {
-      const factor = 50;
-      gScaleU(1 - x / factor);
-      gRotate(-1 * x, 0, 0, 1);
-      gTranslate(-(x / factor) / 2, 1 - x / factor, 0);
-      newTaperedCylinder("#795c2e", textures.BARK, () => {
-        gRotate(270, 1, 0, 0);
-      });
-    }
+    gTranslate(-2, 0.4, 0);
+    gRotate(90, -1, 0, 0);
 
-    // Leaves
-    const leafLength = 3;
-    const numLeaves = 5;
-    for (let x = 0; x < numLeaves; x++) {
-      newCube("#439804", textures.GRASS, () => {
-        gRotate(Math.cos(TIME + x) * 10 + 25, 0, 0, 1);
-        gRotate((360 / numLeaves) * x, 0, 1, 0);
-        gTranslate(leafLength, 0.5, 0);
-        gScale(leafLength, 0, 1);
-      });
-    }
+    const segments = 9;
+    const bark = ["#795c2e", textures.BARK];
 
-    // Coconuts
-    const numCoconuts = 3;
-    for (let x = 0; x < numCoconuts; x++) {
-      newObj(() => {
-        gScaleU(0.75);
-        gTranslate(1 + (x % 2), -0.5 + (x % 2) / 2, x - 1);
-        gRotate(135 + x * 45, 1, 0, 0);
+    drawRecursive(...bark, segments, newTaperedCylinder, () => {
+      gRotate(4, 0, 1, 0);
+      gTranslate(-0.0125, 0, 0.8);
+      gScaleU(0.9);
+    });
 
-        newSphere("#79513E", textures.COCONUT, () => {});
-        newSphere("#000000", null, () => {
-          gTranslate(0, 0.8, 0.25);
-          gScaleU(0.2);
-        });
-        newSphere("#000000", null, () => {
-          gTranslate(0, 0.8, -0.25);
-          gScaleU(0.2);
-        });
-        newSphere("#000000", null, () => {
-          gTranslate(0.5, 0.7, 0);
-          gScaleU(0.2);
+    // Tree toppers
+    newObj(() => {
+      gTranslate(1.5, 0, 4.75);
+      gRotate(90, 1, 0, -1);
+
+      // Leaves
+      const leafLength = 3;
+      const numLeaves = 5;
+      [...Array(numLeaves).keys()].forEach((x) => {
+        newCube("#439804", textures.GRASS, () => {
+          gRotate((360 / numLeaves) * x, 0, 1, 0);
+          gRotate(Math.cos(TIME + x) * 10, 0, 0, 1);
+          gTranslate(leafLength / 3, 0, 0);
+          gScale(leafLength / 3, 0.01, 1 / leafLength);
         });
       });
-    }
+
+      // Coconuts
+      const numCoconuts = 3;
+      [...Array(numCoconuts).keys()].forEach((x) => {
+        newObj(() => {
+          gRotate(45, 0, 1, -1);
+          gScaleU(0.2);
+          gTranslate(1 + (x % 2), -0.5 + (x % 2) / 2, x - 1);
+          gRotate(135 + x * 45, 1, 0, 0);
+
+          newSphere("#79513E", textures.COCONUT, () => {
+            const numHoles = 3;
+            gRotate(90, 0, 0, 1);
+            [...Array(numHoles).keys()].forEach((x) => {
+              newSphere("#000000", null, () => {
+                gRotate((x / numHoles) * 360, 0, 1, 0);
+                gTranslate(0, -0.8, -0.25);
+                gScaleU(0.2);
+              });
+            });
+          });
+        });
+      });
+    });
   });
 
   // Beach chair

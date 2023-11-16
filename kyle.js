@@ -126,6 +126,17 @@ const getUniformLocation = (name) => {
   return gl.getUniformLocation(program, name);
 };
 
+const drawRecursive = (color, texture, count, newShape, transforms) => {
+  if (count <= 0) {
+    return;
+  }
+
+  newShape(color, texture, () => {
+    transforms();
+    drawRecursive(color, texture, count - 1, newShape, transforms);
+  });
+};
+
 const blankTexture = () => {
   const width = 1;
   const height = 1;
