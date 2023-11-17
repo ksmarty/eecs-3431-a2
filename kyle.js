@@ -126,41 +126,22 @@ const getUniformLocation = (name) => {
   return gl.getUniformLocation(program, name);
 };
 
+/**
+ *
+ * @param {string} color Hex code
+ * @param {TextureFile} texture Element of `textures` object
+ * @param {number} count Number of recursive calls
+ * @param {(color: string, texture: string, fn: () => void) => void} newShape Shape drawing function
+ * @param {*} transforms Function of transformations to apply
+ * @returns void
+ */
 const drawRecursive = (color, texture, count, newShape, transforms) => {
-  if (count <= 0) {
-    return;
-  }
+  if (count <= 0) return;
 
   newShape(color, texture, () => {
     transforms();
     drawRecursive(color, texture, count - 1, newShape, transforms);
   });
-};
-
-const blankTexture = () => {
-  const width = 1;
-  const height = 1;
-  const x = ((Math.cos(TIME) + 1) / 2) * 255;
-  const whitePixelData = new Uint8Array([x, x, x, 0]);
-
-  const texture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.RGBA,
-    width,
-    height,
-    0,
-    gl.RGBA,
-    gl.UNSIGNED_BYTE,
-    whitePixelData
-  );
-  return texture;
 };
 
 //-------------- Tapered Cylinder --------------

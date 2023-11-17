@@ -478,13 +478,13 @@ function render() {
 
   // Palm Tree
   newObj(() => {
-    // Trunk
     gTranslate(-2, 0.4, 0);
     gRotate(90, -1, 0, 0);
 
     const segments = 9;
     const bark = ["#795c2e", textures.BARK];
 
+    // Trunk
     drawRecursive(...bark, segments, newTaperedCylinder, () => {
       gRotate(4, 0, 1, 0);
       gTranslate(-0.0125, 0, 0.8);
