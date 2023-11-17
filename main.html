@@ -3,40 +3,23 @@
   <!-- prettier-ignore -->
   <script id="vertex-shader" type="x-shader/x-vertex">#version 300 es
 
-// New
 in vec4 a_position;
 in vec2 a_texcoord;
-  
-//out vec2 v_texcoord;
-
-//uniform mat4 u_projection;
-//uniform mat4 u_view;
-//uniform mat4 u_world;
-
-
-// -----------------------------------
-
-
-// Old
-// in vec4 vPosition;
-// in vec2 vTexCoord;
 
 out vec4 fColor;
-out vec2 fTexCoord;
+out vec2 v_texcoord;
 
-uniform mat4 modelViewMatrix;
-uniform mat4 projectionMatrix;
+uniform mat4 u_view;
+uniform mat4 u_projection;
+uniform mat4 u_world;
 
 
 void main() {
-    gl_Position = projectionMatrix * modelViewMatrix * a_position;
+    gl_Position = u_projection * u_view * a_position;
     
-    fTexCoord = a_texcoord;
-
-    //gl_Position = u_projection * u_view * u_world * a_position;
- 
     // Pass the texture coord to the fragment shader.
-    //v_texcoord = a_texcoord;
+    v_texcoord = a_texcoord;
+
 }
 </script>
 
@@ -51,7 +34,7 @@ uniform sampler2D texture3;
 uniform int useTextures;
 
 in vec4 fColor;
-in vec2 fTexCoord;
+in vec2 v_texcoord;
 in vec4 fColorFromVer;
 
 layout (location=0) out vec4 fragColor;
@@ -61,9 +44,9 @@ void main() {
 
     fragColor = fColor;
     if (useTextures == 1) {
-        c1 = texture(texture1, fTexCoord);
-        c2 = texture(texture2, fTexCoord);
-        c3 = texture(texture3, fTexCoord);
+        c1 = texture(texture1, v_texcoord);
+        c2 = texture(texture2, v_texcoord);
+        c3 = texture(texture3, v_texcoord);
 
         fragColor = mix(c3, mix(c1, c2, 0.5), 0.7);
     }

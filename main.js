@@ -39,8 +39,8 @@ const defaultMaterial = {
 // var ambientColor, diffuseColor, specularColor;
 
 let modelMatrix, viewMatrix;
-let modelViewMatrix, projectionMatrix, normalMatrix;
-let modelViewMatrixLoc, projectionMatrixLoc, normalMatrixLoc;
+let u_view, u_projection, normalMatrix;
+let u_viewLoc, u_projectionLoc, normalMatrixLoc;
 
 /**
  * Camera rotations
@@ -221,9 +221,9 @@ window.onload = function init() {
   gl.uniform1i(getUniformLocation("useTextures"), useTextures);
 
   // record the locations of the matrices that are used in the shaders
-  modelViewMatrixLoc = getUniformLocation("modelViewMatrix");
+  u_viewLoc = getUniformLocation("u_view");
   normalMatrixLoc = getUniformLocation("normalMatrix");
-  projectionMatrixLoc = getUniformLocation("projectionMatrix");
+  u_projectionLoc = getUniformLocation("u_projection");
 
   // set a default material
   setColor(defaultMaterial.diffuse);
@@ -320,9 +320,9 @@ window.onload = function init() {
 
 // Sets the modelview and normal matrix in the shaders
 function setMV() {
-  modelViewMatrix = mult(viewMatrix, modelMatrix);
-  gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-  normalMatrix = inverseTranspose(modelViewMatrix);
+  u_view = mult(viewMatrix, modelMatrix);
+  gl.uniformMatrix4fv(u_viewLoc, false, flatten(u_view));
+  normalMatrix = inverseTranspose(u_view);
   gl.uniformMatrix4fv(normalMatrixLoc, false, flatten(normalMatrix));
 }
 
@@ -330,7 +330,7 @@ function setMV() {
  * Sets the projection, modelview and normal matrices in the shaders.
  */
 function setAllMatrices() {
-  gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
+  gl.uniformMatrix4fv(u_projectionLoc, false, flatten(u_projection));
   setMV();
 }
 
@@ -423,8 +423,8 @@ function render() {
   const eye = vec3(-5, 6, 7);
 
   // set the projection matrix
-  projectionMatrix = perspective(45, 1, near, far);
-  // projectionMatrix = ortho(left, right, bottom, ytop, near, far);
+  u_projection = perspective(45, 1, near, far);
+  // u_projection = ortho(left, right, bottom, ytop, near, far);
 
   const at = vec3(2, 0, -4);
   const up = vec3(0.0, 1.0, 0.0);
