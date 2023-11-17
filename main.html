@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-  <!-- prettier-ignore -->
-  <script id="vertex-shader" type="x-shader/x-vertex">#version 300 es
+<!-- prettier-ignore -->
+<script id="vertex-shader" type="x-shader/x-vertex">#version 300 es
 
 in vec4 a_position;
 in vec2 a_texcoord;
@@ -23,156 +23,111 @@ void main() {
 }
 </script>
 
-  <!-- prettier-ignore -->
-  <script id="fragment-shader" type="x-shader/x-fragment">#version 300 es
+<!-- prettier-ignore -->
+<script id="fragment-shader" type="x-shader/x-fragment">#version 300 es
 
 precision mediump float;
 
 uniform sampler2D texture1;
 uniform sampler2D texture2;
 uniform sampler2D texture3;
+
 uniform int useTextures;
 
 in vec4 fColor;
+// Passed in from the vertex shader.
 in vec2 v_texcoord;
-in vec4 fColorFromVer;
 
 layout (location=0) out vec4 fragColor;
 
 void main() {
-    vec4 c1,c2,c3;
+    vec4 c1, c2, c3;
 
     fragColor = fColor;
-    if (useTextures == 1) {
-        c1 = texture(texture1, v_texcoord);
-        c2 = texture(texture2, v_texcoord);
-        c3 = texture(texture3, v_texcoord);
+    
+    c1 = texture(texture1, v_texcoord);
+    c2 = texture(texture2, v_texcoord);
+    c3 = texture(texture3, v_texcoord);
 
-        fragColor = mix(c3, mix(c1, c2, 0.5), 0.7);
-    }
+    fragColor = mix(c3, mix(c1, c2, 1.0), 1.0);
 
     fragColor.a = 1.0;
 }
 </script>
 
-  <script type="text/javascript" src="Common/webgl-utils.js"></script>
-  <script type="text/javascript" src="Common/initShaders.js"></script>
+<script type="text/javascript" src="Common/webgl-utils.js"></script>
+<script type="text/javascript" src="Common/initShaders.js"></script>
 
-  <script type="text/javascript" src="Common/MV.js"></script>
-  <script type="text/javascript" src="objects.js"></script>
-  <script type="text/javascript" src="kyle.js"></script>
-  <script type="text/javascript" src="main.js"></script>
+<script type="text/javascript" src="Common/MV.js"></script>
+<script type="text/javascript" src="objects.js"></script>
+<script type="text/javascript" src="kyle.js"></script>
+<script type="text/javascript" src="main.js"></script>
 
-  <style>
-    .ViewButton {
-      width: 8em;
-      height: 3em;
-      margin-bottom: 0.25em;
-    }
-  </style>
+<style>
+  .ViewButton {
+    width: 8em;
+    height: 3em;
+    margin-bottom: 0.25em;
+  }
+</style>
 
-  <body>
-    <canvas id="gl-canvas" width="512" height="512">
-      Oops ... your browser doesn't support the HTML5 canvas element
-    </canvas>
+<body>
+  <canvas id="gl-canvas" width="512" height="512">
+    Oops ... your browser doesn't support the HTML5 canvas element
+  </canvas>
 
-    <br />
+  <br />
 
-    <div id="sliderX">
-      X-Roll -180
-      <input
-        id="sliderXi"
-        type="range"
-        min="-180"
-        max="180"
-        step="2"
-        value="0"
-      />
-      180
-      <input id="reset-x" type="button" value="Reset" />
-    </div>
-    <br />
+  <div id="sliderX">
+    X-Roll -180
+    <input id="sliderXi" type="range" min="-180" max="180" step="2" value="0" />
+    180
+    <input id="reset-x" type="button" value="Reset" />
+  </div>
+  <br />
 
-    <div id="sliderY">
-      Y-Roll -180
-      <input
-        id="sliderYi"
-        type="range"
-        min="-180"
-        max="180"
-        step="2"
-        value="0"
-      />
-      180
-      <input id="reset-y" type="button" value="Reset" />
-    </div>
-    <br />
+  <div id="sliderY">
+    Y-Roll -180
+    <input id="sliderYi" type="range" min="-180" max="180" step="2" value="0" />
+    180
+    <input id="reset-y" type="button" value="Reset" />
+  </div>
+  <br />
 
-    <div id="sliderZ">
-      Z-Roll -180
-      <input
-        id="sliderZi"
-        type="range"
-        min="-180"
-        max="180"
-        step="2"
-        value="0"
-      />
-      180
-      <input id="reset-z" type="button" value="Reset" />
-    </div>
-    <br />
+  <div id="sliderZ">
+    Z-Roll -180
+    <input id="sliderZi" type="range" min="-180" max="180" step="2" value="0" />
+    180
+    <input id="reset-z" type="button" value="Reset" />
+  </div>
+  <br />
 
-    <input id="animToggleButton" type="button" value="Toggle Animation" />
-    <input
-      hidden
-      id="textureToggleButton"
-      type="button"
-      value="Toggle Textures"
-    />
-    <input id="reset-all" type="button" value="Reset Camera" />
-    <input id="reset-time" type="button" value="Reset Time" />
-    <br />
-    <br />
+  <input id="animToggleButton" type="button" value="Toggle Animation" />
+  <input hidden id="textureToggleButton" type="button" value="Toggle Textures" />
+  <input id="reset-all" type="button" value="Reset Camera" />
+  <input id="reset-time" type="button" value="Reset Time" />
+  <br />
+  <br />
 
-    <input
-      class="ViewButton"
-      id="view-back-left"
-      type="button"
-      value="BACK LEFT"
-    />
-    <input class="ViewButton" id="view-back" type="button" value="BACK" />
-    <input
-      class="ViewButton"
-      id="view-back-right"
-      type="button"
-      value="BACK RIGHT"
-    />
-    <br />
-    <input class="ViewButton" id="view-left" type="button" value="LEFT" />
-    <input class="ViewButton" id="view-top" type="button" value="TOP" />
-    <input class="ViewButton" id="view-right" type="button" value="RIGHT" />
-    <br />
-    <input
-      class="ViewButton"
-      id="view-front-left"
-      type="button"
-      value="FRONT LEFT"
-    />
-    <input class="ViewButton" id="view-front" type="button" value="FRONT" />
-    <input
-      class="ViewButton"
-      id="view-front-right"
-      type="button"
-      value="FRONT RIGHT"
-    />
+  <input class="ViewButton" id="view-back-left" type="button" value="BACK LEFT" />
+  <input class="ViewButton" id="view-back" type="button" value="BACK" />
+  <input class="ViewButton" id="view-back-right" type="button" value="BACK RIGHT" />
+  <br />
+  <input class="ViewButton" id="view-left" type="button" value="LEFT" />
+  <input class="ViewButton" id="view-top" type="button" value="TOP" />
+  <input class="ViewButton" id="view-right" type="button" value="RIGHT" />
+  <br />
+  <input class="ViewButton" id="view-front-left" type="button" value="FRONT LEFT" />
+  <input class="ViewButton" id="view-front" type="button" value="FRONT" />
+  <input class="ViewButton" id="view-front-right" type="button" value="FRONT RIGHT" />
 
-    <br />
-    <br />
+  <br />
+  <br />
 
-    <div>
-      FPS:
-      <span id="fps">0</span>
-    </div>
-  </body>
+  <div>
+    FPS:
+    <span id="fps">0</span>
+  </div>
+</body>
+
 </html>

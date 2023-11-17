@@ -273,7 +273,10 @@ window.onload = function init() {
   document.getElementById("reset-z").onclick = () => setZ(0);
   document.getElementById("reset-all").onclick = () => setAll(0, 0, 0);
 
-  document.getElementById("reset-time").onclick = () => (TIME = 0);
+  document.getElementById("reset-time").onclick = () => {
+    TIME = 0;
+    window.requestAnimFrame(render);
+  };
 
   document.getElementById("view-back-left").onclick = () => setAll(0, 135, 0);
   document.getElementById("view-back").onclick = () => setAll(0, 180, 0);
