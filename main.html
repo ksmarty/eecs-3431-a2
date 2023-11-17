@@ -3,57 +3,40 @@
   <!-- prettier-ignore -->
   <script id="vertex-shader" type="x-shader/x-vertex">#version 300 es
 
-in vec4 vPosition;
-in vec3 vNormal;
-in vec4 vColor;
-in vec2 vTexCoord;
+// New
+in vec4 a_position;
+in vec2 a_texcoord;
+  
+//out vec2 v_texcoord;
+
+//uniform mat4 u_projection;
+//uniform mat4 u_view;
+//uniform mat4 u_world;
+
+
+// -----------------------------------
+
+
+// Old
+// in vec4 vPosition;
+// in vec2 vTexCoord;
 
 out vec4 fColor;
 out vec2 fTexCoord;
-out vec4 fColorFromVer;
 
-uniform vec4 ambientProduct, diffuseProduct, specularProduct;
 uniform mat4 modelViewMatrix;
-uniform mat4 normalMatrix;
 uniform mat4 projectionMatrix;
-uniform vec4 lightPosition;
-uniform float shininess;
 
 
 void main() {
-    // Transform vertex normal into eye coordinates
-    vec3 pos = (modelViewMatrix * vPosition).xyz;
-    //vec3 N = normalize( (modelViewMatrix*vec4(vNormal,0.0)).xyz);
-    vec3 N = normalize((normalMatrix * vec4(vNormal, 0.0)).xyz);
+    gl_Position = projectionMatrix * modelViewMatrix * a_position;
     
-    vec3 L = vec3(normalize(lightPosition.xyz - pos));
-    vec3 V = normalize(-pos.xyz);
-    vec3 R = reflect(-V, N);
+    fTexCoord = a_texcoord;
 
-    // Compute terms in the illumination equation
-    vec4 ambient = ambientProduct;
-
-    float Kd = max(dot(L, N), 0.0);
-    
-    fColor = ambient;
-    vec4 diffuse = vec4(0.0, 0.0, 0.0, 1.0);
-    vec4 specular = vec4(0.0, 0.0, 0.0, 1.0);
-   
-    diffuse = Kd * diffuseProduct;
-    float Ks = pow(max(dot(R, V), 0.0), shininess);
-    specular = Ks * specularProduct;
-    
-    if (dot(L, N) < 0.0) {
-        specular = vec4(0.0, 0.0, 0.0, 1.0);
-    }
-    
-    gl_Position = projectionMatrix * modelViewMatrix * vPosition;
-    
-    fTexCoord = vTexCoord;
-    fColor = fColor + diffuse + specular;
-    fColor.a = 1.0;
-	
-	  fColorFromVer = vColor;
+    //gl_Position = u_projection * u_view * u_world * a_position;
+ 
+    // Pass the texture coord to the fragment shader.
+    //v_texcoord = a_texcoord;
 }
 </script>
 
@@ -158,7 +141,12 @@ void main() {
     <br />
 
     <input id="animToggleButton" type="button" value="Toggle Animation" />
-    <input id="textureToggleButton" type="button" value="Toggle Textures" />
+    <input
+      hidden
+      id="textureToggleButton"
+      type="button"
+      value="Toggle Textures"
+    />
     <input id="reset-all" type="button" value="Reset Camera" />
     <input id="reset-time" type="button" value="Reset Time" />
     <br />
