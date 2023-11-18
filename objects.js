@@ -17,6 +17,7 @@ function setBuffers(obj, program) {
   gl.bindBuffer(gl.ARRAY_BUFFER, obj.nBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.normalsArray), gl.STATIC_DRAW);
 
+  // WebGL gets mad bc vNormal is unused
   obj.vNormal = gl.getAttribLocation(program, "vNormal");
   gl.vertexAttribPointer(obj.vNormal, 3, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(obj.vNormal);
