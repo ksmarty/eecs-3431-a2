@@ -3,13 +3,13 @@ function setAttribPointers(obj) {
   gl.vertexAttribPointer(obj.vNormal, 3, gl.FLOAT, false, 0, 0);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, obj.pBuffer);
-  gl.vertexAttribPointer(obj.a_position, 4, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribPointer(obj.vPosition, 4, gl.FLOAT, false, 0, 0);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, obj.cBuffer);
   gl.vertexAttribPointer(obj.vColor, 4, gl.FLOAT, false, 0, 0);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, obj.tBuffer);
-  gl.vertexAttribPointer(obj.a_texcoord, 2, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribPointer(obj.vTexCoord, 2, gl.FLOAT, false, 0, 0);
 }
 
 function setBuffers(obj, program) {
@@ -25,9 +25,9 @@ function setBuffers(obj, program) {
   gl.bindBuffer(gl.ARRAY_BUFFER, obj.pBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.pointsArray), gl.STATIC_DRAW);
 
-  obj.a_position = gl.getAttribLocation(program, "a_position");
-  gl.vertexAttribPointer(obj.a_position, 4, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(obj.a_position);
+  obj.vPosition = gl.getAttribLocation(program, "vPosition");
+  gl.vertexAttribPointer(obj.vPosition, 4, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(obj.vPosition);
 
   obj.cBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, obj.cBuffer);
@@ -41,9 +41,9 @@ function setBuffers(obj, program) {
   gl.bindBuffer(gl.ARRAY_BUFFER, obj.tBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.texCoordsArray), gl.STATIC_DRAW);
 
-  obj.a_texcoord = gl.getAttribLocation(program, "a_texcoord");
-  gl.vertexAttribPointer(obj.a_texcoord, 2, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(obj.a_texcoord);
+  obj.vTexCoord = gl.getAttribLocation(program, "vTexCoord");
+  gl.vertexAttribPointer(obj.vTexCoord, 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(obj.vTexCoord);
 }
 
 var SphereSub = {};

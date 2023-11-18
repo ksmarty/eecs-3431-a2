@@ -39,8 +39,8 @@ const defaultMaterial = {
 // var ambientColor, diffuseColor, specularColor;
 
 let modelMatrix, viewMatrix;
-let u_view, u_projection, normalMatrix;
-let u_viewLoc, u_projectionLoc, normalMatrixLoc;
+let u_view, u_projection, u_normal;
+let u_viewLoc, u_projectionLoc, u_normalLoc;
 
 /**
  * Camera rotations
@@ -232,7 +232,7 @@ window.onload = function init() {
 
   // record the locations of the matrices that are used in the shaders
   u_viewLoc = getUniformLocation("u_view");
-  normalMatrixLoc = getUniformLocation("normalMatrix");
+  u_normalLoc = getUniformLocation("u_normal");
   u_projectionLoc = getUniformLocation("u_projection");
 
   // set a default material
@@ -330,8 +330,8 @@ window.onload = function init() {
 function setMV() {
   u_view = mult(viewMatrix, modelMatrix);
   gl.uniformMatrix4fv(u_viewLoc, false, flatten(u_view));
-  normalMatrix = inverseTranspose(u_view);
-  gl.uniformMatrix4fv(normalMatrixLoc, false, flatten(normalMatrix));
+  u_normal = inverseTranspose(u_view);
+  gl.uniformMatrix4fv(u_normalLoc, false, flatten(u_normal));
 }
 
 /**
