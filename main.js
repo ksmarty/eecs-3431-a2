@@ -71,19 +71,19 @@ let fpsElement;
  * @enum {TextureFile}
  */
 const textures = {
-  DEFAULT: "missing_texture.webp",
-  BLANK: "Blank.png",
-  SAND: "GroundSand005/GroundSand005_COL_1K.jpg",
-  BARK: "BarkPoplar001/BarkPoplar001_COL_1K.jpg",
-  COCONUT: "BarkBrown/bark_brown_01_diff_1k.jpg",
-  GRASS: "GroundGrassGreen002/GroundGrassGreen002_COL_1K.jpg",
-  WATER: "summer-background-sea-water.jpg",
-  CHAIR_WOOD: "WoodCabinetWornLong/wood_cabinet_worn_long_diff_1k.jpg",
-  COTTON: "TowelCotton001/TowelCotton001_COL_1K.png",
-  SKIN: "human_skin_5-1K/1K-human_skin_5_diffuseOriginal.jpg",
-  DENIM: "denmin_fabric_02_1k/denmin_fabric_02_diff_1k.jpg",
-  FLOWERS: "fabric_154-1K/fabric_154_basecolor-1K.png",
-  SQUIRRELS: "fabric_155-1K/fabric_155_basecolor-1K.png",
+  DEFAULT: "default",
+  BARK: "bark",
+  GRASS: "grass",
+  SAND: "sand",
+  COCONUT: "coconut",
+  GRASS: "grass",
+  WATER: "water",
+  CHAIR_WOOD: "chair_wood",
+  COTTON: "cotton",
+  SKIN: "skin",
+  DENIM: "denim",
+  FLOWERS: "flowers",
+  SQUIRRELS: "squirrels",
 };
 
 /**
@@ -95,28 +95,43 @@ const textures = {
  */
 
 /**
- * Array of all the textures used in the program
- * @type {Texture[]}
+ * @typedef FullTexture
+ * @type {Object}
+ * @property {Texture} DIF Diffuse Texture
+ * @property {Texture} NRM Normal Map
  */
-let textureArray = [];
 
-const initTextures = () =>
-  (textureArray = Object.values(textures).reduce(
-    (arr, filename, i) => [
+/**
+ * Array of all the textures used in the program
+ * @type {FullTexture[]}
+ */
+let loadedTextures = [];
+
+const initTextures = () => {
+  loadedTextures = Object.values(textures).reduce(
+    (arr, folderName, i) => [
       ...arr,
-      {
-        textureWebGL: gl.createTexture(),
-        isTextureReady: false,
-        image: (() => {
-          const image = new Image();
-          image.src = `textures/${filename}`;
-          image.onload = () => handleTextureLoaded(textureArray[i]);
-          return image;
-        })(),
-      },
+      ["DIF"].reduce(
+        (obj, fileName) => ({
+          ...obj,
+          [fileName]: {
+            textureWebGL: gl.createTexture(),
+            isTextureReady: false,
+            image: (() => {
+              const image = new Image();
+              image.src = `textures/${folderName}/${fileName}.jpg`;
+              image.onload = () =>
+                handleTextureLoaded(loadedTextures[i][fileName]);
+              return image;
+            })(),
+          },
+        }),
+        {}
+      ),
     ],
     []
-  ));
+  );
+};
 
 /**
  * Handle the texture once the image has been loaded
@@ -167,14 +182,16 @@ function setColor(c) {
 
 /**
  * Takes an array of textures and calls render if the textures are created
- * @param {Texture[]} texs Array of textures
+ * @param {FullTexture[]} texs Array of textures
  */
 const waitForTextures = (texs) => {
   setTimeout(() => {
-    const fullyLoaded = texs.every(({ image: { src }, isTextureReady }) => {
-      console.log("boo" + src);
-      return isTextureReady;
-    }, 0);
+    const fullyLoaded = texs
+      .flatMap((t) => Object.values(t))
+      .every(({ image: { src }, isTextureReady }) => {
+        console.log("boo" + src);
+        return isTextureReady;
+      }, 0);
 
     if (fullyLoaded) {
       console.log("ready to render");
@@ -304,7 +321,7 @@ window.onload = function init() {
   initTextures();
 
   // Recursive wait for the textures to load
-  waitForTextures(textureArray);
+  waitForTextures(loadedTextures);
 
   render();
 };

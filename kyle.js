@@ -110,11 +110,11 @@ const gPos = () => vec3(...vertices1);
  * @param {TextureFile} texture Element of `textures` object
  * @param {number} unit Shader unit to use for multiple textures
  */
-const useTexture = (texture, unit = 0) => {
+const useTexture = (texture) => {
   const n = Object.values(textures).indexOf(texture);
-  gl.activeTexture(gl[`TEXTURE${unit}`]);
-  gl.bindTexture(gl.TEXTURE_2D, textureArray[n].textureWebGL);
-  gl.uniform1i(getUniformLocation(`texture${n}`), unit);
+  gl.activeTexture(gl[`TEXTURE${0}`]);
+  gl.bindTexture(gl.TEXTURE_2D, loadedTextures[n].DIF.textureWebGL);
+  gl.uniform1i(getUniformLocation(`texture${1}`), 0);
 };
 
 /**
