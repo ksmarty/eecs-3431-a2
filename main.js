@@ -56,7 +56,7 @@ let TIME = 0.0; // Realtime
 let resetTimerFlag = true;
 let animFlag = false;
 let prevTime = 0.0;
-let useTextures = 1;
+let useProjection = 0;
 
 let controller;
 let fpsElement;
@@ -165,11 +165,6 @@ function setColor(c) {
   gl.uniform1f(getUniformLocation("shininess"), defaultMaterial.shininess);
 }
 
-const toggleTextures = () => {
-  useTextures = !useTextures;
-  gl.uniform1i(getUniformLocation("useTextures"), useTextures);
-};
-
 /**
  * Takes an array of textures and calls render if the textures are created
  * @param {Texture[]} texs Array of textures
@@ -217,8 +212,6 @@ window.onload = function init() {
   Cone.init(9, program);
   Sphere.init(36, program);
   TaperedCylinder.init(9, program);
-
-  gl.uniform1i(getUniformLocation("useTextures"), useTextures);
 
   // record the locations of the matrices that are used in the shaders
   u_viewLoc = getUniformLocation("u_view");
@@ -304,11 +297,6 @@ window.onload = function init() {
     animFlag = false;
     Rotations.x = xRot;
     Rotations.y = yRot;
-    window.requestAnimFrame(render);
-  };
-
-  document.getElementById("textureToggleButton").onclick = function () {
-    toggleTextures();
     window.requestAnimFrame(render);
   };
 

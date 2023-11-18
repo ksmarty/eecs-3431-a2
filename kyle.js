@@ -45,8 +45,7 @@ const newObj = (fn) => {
 const drawObj = (color, texture, drawShape, fn) =>
   newObj(() => {
     fn();
-    if (useTextures) useTexture(texture ?? textures.DEFAULT);
-    else setColor(hex2rgba(color));
+    useTexture(texture ?? textures.DEFAULT);
     drawShape();
   });
 
