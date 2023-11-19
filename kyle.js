@@ -112,9 +112,11 @@ const gPos = () => vec3(...vertices1);
  */
 const useTexture = (texture) => {
   const n = Object.values(textures).indexOf(texture);
-  gl.activeTexture(gl[`TEXTURE${0}`]);
+  gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, loadedTextures[n].DIF.textureWebGL);
-  gl.uniform1i(getUniformLocation(`texture${1}`), 0);
+
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, loadedTextures[n].DIF.textureWebGL);
 };
 
 /**
@@ -141,6 +143,28 @@ const drawRecursive = (color, texture, count, newShape, transforms) => {
     transforms();
     drawRecursive(color, texture, count - 1, newShape, transforms);
   });
+};
+
+/**
+ * Set the currently used program
+ * @param {Program} p
+ */
+const setProgram = (p) => {
+  gl.useProgram(p.program);
+  program = p.program;
+  CurrentProgram = p;
+};
+
+/**
+ * Set uniform locations that may change per render call
+ * @param {Program} programObj Program object
+ */
+const setUniformLocations = (programObj) => {
+  setProgram(programObj);
+  // record the locations of the matrices that are used in the shaders
+  programObj.u_viewLoc = getUniformLocation("u_view");
+  programObj.u_normalLoc = getUniformLocation("u_normal");
+  programObj.u_projectionLoc = getUniformLocation("u_projection");
 };
 
 //-------------- Tapered Cylinder --------------

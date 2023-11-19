@@ -8,9 +8,30 @@
 let gl;
 
 /**
+ * The current program
  * @type {WebGLProgram}
  */
 let program;
+
+/**
+ * @typedef {Object} Program
+ * @property {WebGLProgram} program
+ * @property {WebGLUniformLocation} u_viewLoc
+ * @property {WebGLUniformLocation} u_normalLoc
+ * @property {WebGLUniformLocation} u_projectionLoc
+ */
+
+/**
+ * The current shader program
+ * @type {Program}
+ */
+let CurrentProgram = {};
+
+/**
+ * Array of shader programs
+ * @type {{[key: string]: Program}}
+ */
+let Programs = { Default: {}, Water: {} };
 
 const near = 1;
 const far = 100;
@@ -56,7 +77,6 @@ let TIME = 0.0; // Realtime
 let resetTimerFlag = true;
 let animFlag = false;
 let prevTime = 0.0;
-let useProjection = 0;
 
 let controller;
 let fpsElement;
@@ -221,23 +241,28 @@ window.onload = function init() {
 
   gl.enable(gl.DEPTH_TEST);
 
-  //
-  //  Load shaders and initialize attribute buffers
-  //
-  program = initShaders(gl, "vertex-shader", "fragment-shader");
-  gl.useProgram(program);
+  // Load shaders and initialize attribute buffers
+  Programs.Default.program = initShaders(
+    gl,
+    "vertex-shader",
+    "fragment-shader"
+  );
+  Programs.Water.program = initShaders(
+    gl,
+    "vertex-shader",
+    "fragment-shader-water"
+  );
+
+  setUniformLocations(Programs.Water);
+  setUniformLocations(Programs.Default);
 
   // Load canonical objects and their attributes
+  setProgram(Programs.Default);
   Cube.init(program);
   Cylinder.init(9, program);
   Cone.init(9, program);
   Sphere.init(36, program);
   TaperedCylinder.init(9, program);
-
-  // record the locations of the matrices that are used in the shaders
-  u_viewLoc = getUniformLocation("u_view");
-  u_normalLoc = getUniformLocation("u_normal");
-  u_projectionLoc = getUniformLocation("u_projection");
 
   // set a default material
   setColor(defaultMaterial.diffuse);
@@ -333,16 +358,20 @@ window.onload = function init() {
 // Sets the modelview and normal matrix in the shaders
 function setMV() {
   u_view = mult(viewMatrix, modelMatrix);
-  gl.uniformMatrix4fv(u_viewLoc, false, flatten(u_view));
+  gl.uniformMatrix4fv(CurrentProgram.u_viewLoc, false, flatten(u_view));
   u_normal = inverseTranspose(u_view);
-  gl.uniformMatrix4fv(u_normalLoc, false, flatten(u_normal));
+  gl.uniformMatrix4fv(CurrentProgram.u_normalLoc, false, flatten(u_normal));
 }
 
 /**
  * Sets the projection, modelview and normal matrices in the shaders.
  */
 function setAllMatrices() {
-  gl.uniformMatrix4fv(u_projectionLoc, false, flatten(u_projection));
+  gl.uniformMatrix4fv(
+    CurrentProgram.u_projectionLoc,
+    false,
+    flatten(u_projection)
+  );
   setMV();
 }
 
@@ -471,6 +500,10 @@ function render() {
     TIME += diff;
     prevTime = curTime;
   }
+
+  // Send time to shaders
+  // const iDate = vec4(2023.0, 11.0, 19.0, 1.0);
+  // gl.uniform1i( gl.getUniformLocation(program, "iDate"), iDate );
 
   // ---------------------------- Drawing ----------------------------
 

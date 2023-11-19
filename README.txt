@@ -6,6 +6,8 @@ From A1, I re-used (and extended) `kyle.js` and `main.html`. `main.js` was also 
 
 HDRI (skybox) via https://polyhaven.com/a/kloofendal_43d_clear_puresky
 
+Explanation and some code on normal maps came from this excellent writeup: https://apoorvaj.io/exploring-bump-mapping-with-webgl/
+
 ## Idea
 
 Desert island

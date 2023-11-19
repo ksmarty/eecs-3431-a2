@@ -1,12 +1,12 @@
 function setAttribPointers(obj) {
-  gl.bindBuffer(gl.ARRAY_BUFFER, obj.nBuffer);
-  gl.vertexAttribPointer(obj.vNormal, 3, gl.FLOAT, false, 0, 0);
+  // gl.bindBuffer(gl.ARRAY_BUFFER, obj.nBuffer);
+  // gl.vertexAttribPointer(obj.vNormal, 3, gl.FLOAT, false, 0, 0);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, obj.pBuffer);
   gl.vertexAttribPointer(obj.vPosition, 4, gl.FLOAT, false, 0, 0);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, obj.cBuffer);
-  gl.vertexAttribPointer(obj.vColor, 4, gl.FLOAT, false, 0, 0);
+  // gl.bindBuffer(gl.ARRAY_BUFFER, obj.cBuffer);
+  // gl.vertexAttribPointer(obj.vColor, 4, gl.FLOAT, false, 0, 0);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, obj.tBuffer);
   gl.vertexAttribPointer(obj.vTexCoord, 2, gl.FLOAT, false, 0, 0);
@@ -18,9 +18,9 @@ function setBuffers(obj, program) {
   gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.normalsArray), gl.STATIC_DRAW);
 
   // WebGL gets mad bc vNormal is unused
-  obj.vNormal = gl.getAttribLocation(program, "vNormal");
-  gl.vertexAttribPointer(obj.vNormal, 3, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(obj.vNormal);
+  // obj.vNormal = gl.getAttribLocation(program, "vNormal");
+  // gl.vertexAttribPointer(obj.vNormal, 3, gl.FLOAT, false, 0, 0);
+  // gl.enableVertexAttribArray(obj.vNormal);
 
   obj.pBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, obj.pBuffer);
@@ -34,9 +34,10 @@ function setBuffers(obj, program) {
   gl.bindBuffer(gl.ARRAY_BUFFER, obj.cBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.colorsArray), gl.STATIC_DRAW);
 
-  obj.vColor = gl.getAttribLocation(program, "vColor");
-  gl.vertexAttribPointer(obj.vColor, 4, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(obj.vColor);
+  // WebGL gets mad bc vColor is unused
+  // obj.vColor = gl.getAttribLocation(program, "vColor");
+  // gl.vertexAttribPointer(obj.vColor, 4, gl.FLOAT, false, 0, 0);
+  // gl.enableVertexAttribArray(obj.vColor);
 
   obj.tBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, obj.tBuffer);

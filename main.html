@@ -5,10 +5,8 @@
 
 in vec4 vPosition;
 in vec3 vNormal;
-in vec4 vColor;
 in vec2 vTexCoord;
 
-out vec4 fColor;
 out vec2 fTexCoord;
 out vec4 fColorFromVertex;
 
@@ -24,8 +22,6 @@ void main() {
   
   // Pass the texture coord to the fragment shader.
   fTexCoord = vTexCoord;
-
-  fColorFromVertex = vColor;
 }
 </script>
 
@@ -34,30 +30,44 @@ void main() {
 
 precision mediump float;
 
-uniform sampler2D texture1;
-uniform sampler2D texture2;
-uniform sampler2D texture3;
+uniform sampler2D texture_diffuse;
+uniform sampler2D texture_normal;
+uniform sampler2D texture_bump;
 
-uniform int useProjection;
-
-in vec4 fColor;
 in vec2 fTexCoord;
-in vec4 fColorFromVertex;
 
 out vec4 fragColor;
 
 void main() {
     vec4 c1, c2, c3;
 
-    fragColor = fColor;
-
-    c1 = texture(texture1, fTexCoord);
-    c2 = texture(texture2, fTexCoord);
-    c3 = texture(texture3, fTexCoord);
+    c1 = texture(texture_diffuse, fTexCoord);
+    c2 = texture(texture_normal, fTexCoord);
+    c3 = texture(texture_bump, fTexCoord);
 
     fragColor = mix(c3, mix(c1, c2, 1.0), 1.0);
 
     fragColor.a = 1.0;
+}
+</script>
+
+<!-- prettier-ignore -->
+<script id="fragment-shader-water" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+
+in vec2 fTexCoord;
+
+out vec4 fragColor;
+
+const vec3 MAT_COL1 = vec3(-2.0, -1.0, 2.0);
+const vec3 MAT_COL2 = vec3(3.0, -2.0, 1.0);
+const vec3 MAT_COL3 = vec3(1.0, 2.0, 2.0);
+const vec4 iDate = vec4(2023.0, 11.0, 19.0, 1.0);
+
+void main() {
+  float F = length(0.5 - fract(fragColor.xyw *= mat3(MAT_COL1, MAT_COL2, MAT_COL3)));
+  fragColor.xy = fTexCoord * (sin(fragColor = iDate * 0.2).w + 2.0) / 200.0;
+  fragColor = pow(min(min(F * 0.5, F * 0.4), F * 0.3), 7.0) * 25.0 + vec4(0.0, 0.35, 0.5, 1.0);
 }
 </script>
 
