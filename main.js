@@ -111,7 +111,7 @@ const initTextures = () => {
   loadedTextures = Object.values(textures).reduce(
     (arr, folderName, i) => [
       ...arr,
-      ["DIF"].reduce(
+      ["DIF", "NRM"].reduce(
         (obj, fileName) => ({
           ...obj,
           [fileName]: {
@@ -158,7 +158,6 @@ const handleTextureLoaded = (textureObj) => {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT); //Prevents s-coordinate wrapping (repeating)
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT); //Prevents t-coordinate wrapping (repeating)
   gl.bindTexture(gl.TEXTURE_2D, null);
-  console.log(textureObj.image.src);
 
   textureObj.isTextureReady = true;
 };
@@ -188,8 +187,7 @@ const waitForTextures = (texs) => {
   setTimeout(() => {
     const fullyLoaded = texs
       .flatMap((t) => Object.values(t))
-      .every(({ image: { src }, isTextureReady }) => {
-        console.log("boo" + src);
+      .every(({ isTextureReady }) => {
         return isTextureReady;
       }, 0);
 
@@ -197,7 +195,13 @@ const waitForTextures = (texs) => {
       console.log("ready to render");
       window.requestAnimFrame(render);
     } else {
-      console.log(new Date().getTime() + " not ready yet");
+      const missing = texs
+        .flatMap((t) => Object.values(t))
+        .filter(({ isTextureReady }) => {
+          return !isTextureReady;
+        })
+        .reduce((str, t) => `${str}\n\t${t.image.src}`, "");
+      console.log(`Not ready yet. Still missing: ${missing}`);
       waitForTextures(texs);
     }
   }, 0);
