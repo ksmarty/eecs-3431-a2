@@ -29,9 +29,10 @@ let CurrentProgram = {};
 
 /**
  * Array of shader programs
- * @type {{[key: string]: Program}}
+ * @property {Program} Default
+ * @property {Program} Water
  */
-let Programs = { Default: {}, Water: {} };
+const Programs = { Default: {}, Water: {} };
 
 const near = 1;
 const far = 100;
@@ -253,8 +254,8 @@ window.onload = function init() {
     "fragment-shader-water"
   );
 
-  setUniformLocations(Programs.Water);
   setUniformLocations(Programs.Default);
+  setUniformLocations(Programs.Water);
 
   // Load canonical objects and their attributes
   setProgram(Programs.Default);
@@ -486,7 +487,8 @@ function render() {
   gRotate(Rotations.z, 1, 0, 0);
 
   // send all the matrices to the shaders
-  setAllMatrices();
+  setProgram(Programs.Default);
+  setUniforms();
 
   // get real time
   if (animFlag) {
@@ -501,14 +503,10 @@ function render() {
     prevTime = curTime;
   }
 
-  // Send time to shaders
-  // const iDate = vec4(2023.0, 11.0, 19.0, 1.0);
-  // gl.uniform1i( gl.getUniformLocation(program, "iDate"), iDate );
-
   // ---------------------------- Drawing ----------------------------
 
   // Water
-  newObj(() => {
+  withShader(Programs.Water, () => {
     newSphere("#006994", textures.WATER, () => {
       gScale(100, 0.01, 100);
     });

@@ -157,14 +157,35 @@ const setProgram = (p) => {
 
 /**
  * Set uniform locations that may change per render call
- * @param {Program} programObj Program object
+ * @param {Program} p Program object
  */
-const setUniformLocations = (programObj) => {
-  setProgram(programObj);
+const setUniformLocations = (p) => {
+  setProgram(p);
+
+  p.timeLoc = getUniformLocation("time");
+
   // record the locations of the matrices that are used in the shaders
-  programObj.u_viewLoc = getUniformLocation("u_view");
-  programObj.u_normalLoc = getUniformLocation("u_normal");
-  programObj.u_projectionLoc = getUniformLocation("u_projection");
+  p.u_viewLoc = getUniformLocation("u_view");
+  p.u_normalLoc = getUniformLocation("u_normal");
+  p.u_projectionLoc = getUniformLocation("u_projection");
+};
+
+/**
+ *
+ * @param {Program} p Shader program to use
+ * @param {() => void} fn Function with drawing commands
+ */
+const withShader = (p, fn) => {
+  setProgram(p);
+  setUniforms();
+  fn();
+  setProgram(Programs.Default);
+  setUniforms();
+};
+
+const setUniforms = () => {
+  gl.uniform1f(CurrentProgram.timeLoc, TIME / 5);
+  setAllMatrices();
 };
 
 //-------------- Tapered Cylinder --------------

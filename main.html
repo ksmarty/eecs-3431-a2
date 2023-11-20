@@ -53,22 +53,40 @@ void main() {
 
 <!-- prettier-ignore -->
 <script id="fragment-shader-water" type="x-shader/x-fragment">#version 300 es
-precision highp float;
+precision mediump float;
 
 in vec2 fTexCoord;
 
+uniform float time; // Time uniform for animation
+
+const vec2 resolution = vec2(0.1);
+
 out vec4 fragColor;
 
-const vec3 MAT_COL1 = vec3(-2.0, -1.0, 2.0);
-const vec3 MAT_COL2 = vec3(3.0, -2.0, 1.0);
-const vec3 MAT_COL3 = vec3(1.0, 2.0, 2.0);
-const vec4 iDate = vec4(2023.0, 11.0, 19.0, 1.0);
+const float TAU = 6.28318530718;
+const int MAX_ITER = 5;
+const float inten = .005;
 
 void main() {
-  float F = length(0.5 - fract(fragColor.xyw *= mat3(MAT_COL1, MAT_COL2, MAT_COL3)));
-  fragColor.xy = fTexCoord * (sin(fragColor = iDate * 0.2).w + 2.0) / 200.0;
-  fragColor = pow(min(min(F * 0.5, F * 0.4), F * 0.3), 7.0) * 25.0 + vec4(0.0, 0.35, 0.5, 1.0);
+  vec2 uv = fTexCoord.xy / resolution.xy;
+  
+  vec2 p = mod(uv * TAU, TAU) - 250.0;
+  vec2 i = vec2(p);
+  float c = 1.0;
+
+  for (int n = 0; n < MAX_ITER; n++) {
+    float t = time * (1.0 - (3.5 / float(n + 1)));
+    i = p + vec2(cos(t - i.x) + sin(t + i.y), sin(t - i.y) + cos(t + i.x));
+    c += 1.0 / length(vec2(p.x / (sin(i.x + t) / inten), p.y / (cos(i.y + t) / inten)));
+  }
+  c /= float(MAX_ITER);
+  c = 1.17 - pow(c, 1.4);
+  vec3 colour = vec3(pow(abs(c), 8.0));
+  colour = clamp(colour + vec3(0.0, 0.35, 0.5), 0.0, 1.0);
+
+  fragColor = vec4(colour, 1.0);
 }
+    
 </script>
 
 <script type="text/javascript" src="Common/webgl-utils.js"></script>
