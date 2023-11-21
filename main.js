@@ -105,6 +105,8 @@ const textures = {
   DENIM: "denim",
   FLOWERS: "flowers",
   SQUIRRELS: "squirrels",
+  EYE: "eye",
+  BLACK: "black",
 };
 
 /**
@@ -462,7 +464,8 @@ function gPush() {
 function render() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  const eye = vec3(-5, 6, 7);
+  // const eye = vec3(-5, 6, 7);
+  const eye = vec3(-1, 4, 2);
 
   // set the projection matrix
   u_projection = perspective(45, 1, near, far);
@@ -564,7 +567,7 @@ function render() {
             const numHoles = 3;
             gRotate(90, 0, 0, 1);
             [...Array(numHoles).keys()].forEach((x) => {
-              newSphere("#000000", null, () => {
+              newSphere("", textures.BLACK, () => {
                 gRotate((x / numHoles) * 360, 0, 1, 0);
                 gTranslate(0, -0.8, -0.25);
                 gScaleU(0.2);
@@ -712,6 +715,45 @@ function render() {
       // Head;
       newSphere(...skin, () => {
         gTranslate(0, 0, 1.5);
+
+        // Eyes
+        [-1, 1].forEach((e) => {
+          newSphere("", textures.EYE, () => {
+            gTranslate(e * 0.2, -0.4, 0.1);
+            gRotate(e * 20, 0, 0, 1);
+            gScaleU(0.1);
+          });
+        });
+
+        // Mouth
+        newSphere("", textures.BLACK, () => {
+          gTranslate(0, -0.28, -0.2);
+          gScaleU(0.2);
+        });
+        newSphere("", textures.SKIN, () => {
+          gTranslate(0, -0.28, -0.17);
+          gScaleU(0.21);
+        });
+
+        // Hair
+        [...Array(31).keys()]
+          .map((i) => i - 15)
+          .forEach((y) => {
+            [...Array(31).keys()]
+              .map((i) => i - 15)
+              .forEach((x) => {
+                newObj(() => {
+                  gRotate(y * 3, 1, 0, 0);
+                  newTaperedCylinder("", textures.COCONUT, () => {
+                    gRotate(x * 3, 0, 1, 0);
+                    gTranslate(0, 0, 0.6);
+                    // gTranslate(0, 0, 0.15);
+                    gScale(0.03, 0.03, 0.3);
+                  });
+                });
+              });
+          });
+
         gScale(0.5, 0.5, 0.6);
       });
 

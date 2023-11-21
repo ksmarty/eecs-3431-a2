@@ -112,11 +112,12 @@ const gPos = () => vec3(...vertices1);
  */
 const useTexture = (texture) => {
   const n = Object.values(textures).indexOf(texture);
+  // Diffuse / Colour texture
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, loadedTextures[n].DIF.textureWebGL);
-
+  // Normal map
   gl.activeTexture(gl.TEXTURE1);
-  gl.bindTexture(gl.TEXTURE_2D, loadedTextures[n].DIF.textureWebGL);
+  gl.bindTexture(gl.TEXTURE_2D, loadedTextures[n].NRM.textureWebGL);
 };
 
 /**

@@ -822,6 +822,11 @@ Sphere.init = function (n, program) {
       var vd3 = this.getVertex(u + du, v + dv);
       var vd4 = this.getVertex(u, v + dv);
 
+      // AddInAttribArrays(vd1);
+      // AddInAttribArrays(vd2);
+      // AddInAttribArrays(vd3);
+      // AddInAttribArrays(vd4);
+
       // Triangle one
       if (!flip(vd1, vd2, vd3)) {
         AddInAttribArrays(this, vd1);
@@ -855,5 +860,5 @@ Sphere.draw = function () {
   //gl.disable(gl.CULL_FACE) ;
 
   setAttribPointers(this);
-  gl.drawArrays(gl.TRIANGLES, 0, this.n * this.n * 6);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.n * this.n * 6);
 };
