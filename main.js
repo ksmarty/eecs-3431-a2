@@ -543,16 +543,16 @@ function render() {
       gRotate(90, 1, 0, -1);
 
       // Leaves
-      const leafLength = 3;
       const numLeaves = 5;
-      [-15, 0, 30].forEach((x, i) => {
+      [-20, 15, 30].forEach((x, i) => {
         [...Array(numLeaves).keys()].forEach((y) => {
           newTaperedCylinder("#439804", textures.GRASS, () => {
+            const leafLength = Math.abs(x) / 10;
             gRotate((360 / numLeaves) * y + 35 * i, 0, 1, 0);
             gRotate(Math.cos(TIME + y) * 10 + x, 0, 0, 1);
             gTranslate(leafLength / 3, 0, 0);
             gRotate(90, 0, 1, 0);
-            gScale(leafLength / 3, 0.01, x / 10);
+            gScale(numLeaves / 7, 0.01, leafLength);
           });
         });
       });
@@ -563,7 +563,7 @@ function render() {
         newObj(() => {
           gRotate(45, 0, 1, -1);
           gScaleU(0.2);
-          gTranslate(1 + (x % 2), -0.5 + (x % 2) / 2, x - 1);
+          gTranslate(2 + (x % 2), -1.5 + (x % 2) / 2, x - 1);
           gRotate(135 + x * 45, 1, 0, 0);
 
           newSphere("#79513E", textures.COCONUT, () => {
