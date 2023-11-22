@@ -5,18 +5,6 @@
  **********************************************************************/
 
 /**
- * Converts a hex color string to RGBA.
- * Modified from https://stackoverflow.com/a/51564734
- *
- * @param {string} hex - The hex color string.
- * @returns {vec4} The RGBA components as a vec4.
- */
-const hex2rgba = (hex) => {
-  const [r, g, b, a] = hex.match(/\w\w/g).map((x) => parseInt(x, 16) / 255);
-  return vec4(r, g, b, 255);
-};
-
-/**
  * Draws a cylinder along z axis of height 1 centered at the origin and radius 0.5.
  * Sets the modelview and normal matrices of the global program.
  */
@@ -37,12 +25,11 @@ const newObj = (fn) => {
 
 /**
  * Wrapper for drawing objects
- * @param {string} color Hex code
  * @param {TextureFile} texture Element of `textures` object
  * @param {() => void} drawShape Function that draws an object
  * @param {() => void} fn Function of transformations to apply
  */
-const drawObj = (color, texture, drawShape, fn) =>
+const drawObj = (texture, drawShape, fn) =>
   newObj(() => {
     fn();
     useTexture(texture ?? textures.DEFAULT);
@@ -51,46 +38,39 @@ const drawObj = (color, texture, drawShape, fn) =>
 
 /**
  * Draw a new cube
- * @param {string} color Hex code
  * @param {TextureFile} texture Element of `textures` object
  * @param {() => void} fn Function of transformations to apply
  */
-const newCube = (color, texture, fn) => drawObj(color, texture, drawCube, fn);
+const newCube = (texture, fn) => drawObj(texture, drawCube, fn);
 
 /**
  * Draw a new sphere
- * @param {string} color Hex code
  * @param {TextureFile} texture Element of `textures` object
  * @param {() => void} fn Function of transformations to apply
  */
-const newSphere = (color, texture, fn) =>
-  drawObj(color, texture, drawSphere, fn);
+const newSphere = (texture, fn) => drawObj(texture, drawSphere, fn);
 
 /**
  * Draw a new cone
- * @param {string} color Hex code
  * @param {TextureFile} texture Element of `textures` object
  * @param {() => void} fn Function of transformations to apply
  */
-const newCone = (color, texture, fn) => drawObj(color, texture, drawCone, fn);
+const newCone = (texture, fn) => drawObj(texture, drawCone, fn);
 
 /**
  * Draw a new cylinder
- * @param {string} color Hex code
  * @param {TextureFile} texture Element of `textures` object
  * @param {() => void} fn Function of transformations to apply
  */
-const newCylinder = (color, texture, fn) =>
-  drawObj(color, texture, drawCylinder, fn);
+const newCylinder = (texture, fn) => drawObj(texture, drawCylinder, fn);
 
 /**
  * Draw a new cylinder
- * @param {string} color Hex code
  * @param {TextureFile} texture Element of `textures` object
  * @param {() => void} fn Function of transformations to apply
  */
-const newTaperedCylinder = (color, texture, fn) =>
-  drawObj(color, texture, drawTaperedCylinder, fn);
+const newTaperedCylinder = (texture, fn) =>
+  drawObj(texture, drawTaperedCylinder, fn);
 
 /**
  * Uniformly scale
@@ -130,19 +110,18 @@ const getUniformLocation = (name) => {
 
 /**
  *
- * @param {string} color Hex code
  * @param {TextureFile} texture Element of `textures` object
  * @param {number} count Number of recursive calls
- * @param {(color: string, texture: string, fn: () => void) => void} newShape Shape drawing function
+ * @param {(texture: string, fn: () => void) => void} newShape Shape drawing function
  * @param {*} transforms Function of transformations to apply
  * @returns void
  */
-const drawRecursive = (color, texture, count, newShape, transforms) => {
+const drawRecursive = (texture, count, newShape, transforms) => {
   if (count <= 0) return;
 
-  newShape(color, texture, () => {
+  newShape(texture, () => {
     transforms();
-    drawRecursive(color, texture, count - 1, newShape, transforms);
+    drawRecursive(texture, count - 1, newShape, transforms);
   });
 };
 
@@ -212,6 +191,12 @@ const newCoconut = (initX, initY, initZ) => ({
     y: 0,
     z: 0,
   },
+  /**
+   *
+   * @param {number} x X translation
+   * @param {number} y Y translation
+   * @param {number} z Z translation
+   */
   move(x, y, z) {
     this.offsets.x = x;
     this.offsets.y = y;
@@ -225,11 +210,11 @@ const newCoconut = (initX, initY, initZ) => ({
       gRotate(-20, 0, 0, 1);
       gTranslate(this.offsets.x, this.offsets.y, this.offsets.z);
 
-      newSphere("#79513E", textures.COCONUT, () => {
+      newSphere(textures.COCONUT, () => {
         const numHoles = 3;
         gRotate(90, 0, 0, 1);
         [...Array(numHoles).keys()].forEach((x) => {
-          newSphere("", textures.BLACK, () => {
+          newSphere(textures.BLACK, () => {
             gRotate((x / numHoles) * 360, 0, 1, 0);
             gTranslate(0, -0.8, -0.25);
             gScaleU(0.2);

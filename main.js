@@ -220,9 +220,7 @@ const waitForTextures = (texs) => {
     } else {
       const missing = texs
         .flatMap((t) => Object.values(t))
-        .filter(({ isTextureReady }) => {
-          return !isTextureReady;
-        })
+        .filter(({ isTextureReady }) => !isTextureReady)
         .reduce((str, t) => `${str}\n\t${t.image.src}`, "");
       console.log(`Not ready yet. Still missing: ${missing}`);
       waitForTextures(texs);
@@ -514,14 +512,14 @@ function render() {
 
   // Water
   withShader(Programs.Water, () => {
-    newSphere("#006994", textures.WATER, () => {
+    newSphere(textures.WATER, () => {
       gScale(100, 0.01, 100);
     });
   });
 
   // Island
   newObj(() => {
-    newSphere("#c2b280", textures.SAND, () => {
+    newSphere(textures.SAND, () => {
       gScale(5, 1, 5);
     });
   });
@@ -532,10 +530,10 @@ function render() {
     gRotate(90, -1, 0, 0);
 
     const segments = 10;
-    const bark = ["#795c2e", textures.BARK];
+    const bark = textures.BARK;
 
     // Trunk
-    drawRecursive(...bark, segments, newTaperedCylinder, () => {
+    drawRecursive(bark, segments, newTaperedCylinder, () => {
       gRotate(4, 0, 1, 0);
       gTranslate(-0.0125, 0, 0.8);
       gScaleU(0.9);
@@ -550,7 +548,7 @@ function render() {
       const numLeaves = 5;
       [-20, 15, 30].forEach((x, i) => {
         [...Array(numLeaves).keys()].forEach((y) => {
-          newTaperedCylinder("#439804", textures.GRASS, () => {
+          newTaperedCylinder(textures.GRASS, () => {
             const leafLength = Math.abs(x) / 10;
             gRotate((360 / numLeaves) * y + 35 * i, 0, 1, 0);
             gRotate(Math.cos(TIME + y) * 10 + x, 0, 0, 1);
@@ -575,19 +573,19 @@ function render() {
     gTranslate(1, 3.8, 0);
 
     // Top Fabric
-    newCube("#017fbd", textures.FLOWERS, () => {
+    newCube(textures.FLOWERS, () => {
       gTranslate(0, 0, -2);
       gRotate(45, 1, 0, 0);
       gScale(1, 0.02, 1.5);
     });
     // Bottom Fabric
-    newCube("#017fbd", textures.FLOWERS, () => {
+    newCube(textures.FLOWERS, () => {
       gTranslate(0, -1, 1);
       gScale(1, 0.02, 2);
     });
 
     // Wood Supports
-    const woodSupport = (fn) => newCylinder("#a48205", textures.CHAIR_WOOD, fn);
+    const woodSupport = (fn) => newCylinder(textures.CHAIR_WOOD, fn);
     [-1, 1].forEach((e) => {
       newObj(() => {
         gTranslate(e, 0, 0);
@@ -603,7 +601,7 @@ function render() {
           gScale(0.2, 0.2, 3);
         });
         // Back Bar Caps
-        newSphere("#a48205", textures.CHAIR_WOOD, () => {
+        newSphere(textures.CHAIR_WOOD, () => {
           gTranslate(0, 1.025, -3.025);
           gRotate(45, 1, 0, 0);
           gScaleU(0.1);
@@ -641,10 +639,10 @@ function render() {
     gScaleU(0.5);
     gTranslate(1, 4, 0);
 
-    const skin = ["#a3806d", textures.SKIN];
+    const skin = [textures.SKIN];
 
     // Shirt
-    const shirt = ["#a3806d", textures.SQUIRRELS];
+    const shirt = [textures.SQUIRRELS];
     newTaperedCylinder(...shirt, () => {
       gTranslate(0, -0.3, -1.1);
       gRotate(-135, 1, 0, 0);
@@ -682,7 +680,7 @@ function render() {
                 gTranslate(0, 0, 0.25);
 
                 // Forearm
-                newTaperedCylinder("...skin", textures.DEFAULT, () => {
+                newTaperedCylinder(textures.DEFAULT, () => {
                   gRotate(60 + Math.cos(TIME) * 30, 1, e, 0);
                   gTranslate(0, 0, 0.5);
 
@@ -708,7 +706,7 @@ function render() {
 
         // Eyes
         [-1, 1].forEach((e) => {
-          newSphere("", textures.EYE, () => {
+          newSphere(textures.EYE, () => {
             gTranslate(e * 0.2, -0.4, 0.1);
             gRotate(e * 20, 0, 0, 1);
             gScaleU(0.1);
@@ -716,11 +714,11 @@ function render() {
         });
 
         // Mouth
-        newSphere("", textures.BLACK, () => {
+        newSphere(textures.BLACK, () => {
           gTranslate(0, -0.28, -0.2);
           gScaleU(0.2);
         });
-        newSphere("", textures.SKIN, () => {
+        newSphere(textures.SKIN, () => {
           gTranslate(0, -0.28, -0.17);
           gScaleU(0.21);
         });
@@ -734,7 +732,7 @@ function render() {
               .forEach((x) => {
                 newObj(() => {
                   gRotate(y * 3, 1, 0, 0);
-                  newTaperedCylinder("", textures.COCONUT, () => {
+                  newTaperedCylinder(textures.COCONUT, () => {
                     gRotate(x * 3, 0, 1, 0);
                     gTranslate(0, 0, 0.6);
                     // gTranslate(0, 0, 0.15);
@@ -747,7 +745,7 @@ function render() {
         gScale(0.5, 0.5, 0.6);
       });
 
-      const shorts = ["#2f5060", textures.DENIM];
+      const shorts = [textures.DENIM];
 
       // Hips
       newCylinder(...shorts, () => {
