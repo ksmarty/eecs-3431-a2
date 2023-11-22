@@ -189,6 +189,42 @@ const setUniforms = () => {
   setAllMatrices();
 };
 
+//------------------- Objects ------------------
+
+const newCoconut = (initX, initY, initZ) => ({
+  offsets: {
+    x: 0,
+    y: 0,
+    z: 0,
+  },
+  move(x, y, z) {
+    this.offsets.x = x;
+    this.offsets.y = y;
+    this.offsets.z = z;
+  },
+  draw() {
+    newObj(() => {
+      gRotate(45, 0, 1, -1);
+      gScaleU(0.2);
+      gTranslate(initX, initY, initZ);
+      gRotate(-20, 0, 0, 1);
+      gTranslate(this.offsets.x, this.offsets.y, this.offsets.z);
+
+      newSphere("#79513E", textures.COCONUT, () => {
+        const numHoles = 3;
+        gRotate(90, 0, 0, 1);
+        [...Array(numHoles).keys()].forEach((x) => {
+          newSphere("", textures.BLACK, () => {
+            gRotate((x / numHoles) * 360, 0, 1, 0);
+            gTranslate(0, -0.8, -0.25);
+            gScaleU(0.2);
+          });
+        });
+      });
+    });
+  },
+});
+
 //-------------- Tapered Cylinder --------------
 
 const TaperedCylinder = {

@@ -461,6 +461,10 @@ function gPush() {
   MS.push(modelMatrix);
 }
 
+const coconuts = [...Array(3).keys()].map((x) =>
+  newCoconut(2 + (x % 2), -1.5 + (x % 2) / 2, x - 1)
+);
+
 function render() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -505,6 +509,8 @@ function render() {
     TIME += diff;
     prevTime = curTime;
   }
+
+  const loopTime = TIME % 30;
 
   // ---------------------------- Drawing ----------------------------
 
@@ -558,27 +564,8 @@ function render() {
       });
 
       // Coconuts
-      const numCoconuts = 3;
-      [...Array(numCoconuts).keys()].forEach((x) => {
-        newObj(() => {
-          gRotate(45, 0, 1, -1);
-          gScaleU(0.2);
-          gTranslate(2 + (x % 2), -1.5 + (x % 2) / 2, x - 1);
-          gRotate(135 + x * 45, 1, 0, 0);
-
-          newSphere("#79513E", textures.COCONUT, () => {
-            const numHoles = 3;
-            gRotate(90, 0, 0, 1);
-            [...Array(numHoles).keys()].forEach((x) => {
-              newSphere("", textures.BLACK, () => {
-                gRotate((x / numHoles) * 360, 0, 1, 0);
-                gTranslate(0, -0.8, -0.25);
-                gScaleU(0.2);
-              });
-            });
-          });
-        });
-      });
+      if (loopTime < 0.85) coconuts[1].move(20 * TIME ** 2, 0, 0);
+      coconuts.forEach((e) => e.draw());
     });
   });
 
