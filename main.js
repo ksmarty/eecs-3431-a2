@@ -58,7 +58,7 @@ const defaultMaterial = {
   shininess: 30.0,
 };
 
-// var ambientColor, diffuseColor, specularColor;
+// let ambientColor, diffuseColor, specularColor;
 
 let modelMatrix, viewMatrix;
 let u_view, u_projection, u_normal;
@@ -510,8 +510,6 @@ function render() {
     prevTime = curTime;
   }
 
-  const loopTime = TIME % 30;
-
   // ---------------------------- Drawing ----------------------------
 
   // Water
@@ -564,7 +562,9 @@ function render() {
       });
 
       // Coconuts
-      if (loopTime < 0.85) coconuts[1].move(20 * TIME ** 2, 0, 0);
+      newAnimation(2, 0.85, (localTime) => {
+        coconuts[1].move(20 * localTime ** 2, 0, 0);
+      });
       coconuts.forEach((e) => e.draw());
     });
   });

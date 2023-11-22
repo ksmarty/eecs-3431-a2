@@ -184,9 +184,24 @@ const withShader = (p, fn) => {
   setUniforms();
 };
 
+/**
+ * Set uniforms
+ */
 const setUniforms = () => {
   gl.uniform1f(CurrentProgram.timeLoc, TIME / 5);
   setAllMatrices();
+};
+
+/**
+ *
+ * @param {number} start Start time
+ * @param {number} duration Duration in seconds
+ * @param {(localTime: number) => void} animation Animation function with "local time"
+ * @returns
+ */
+const newAnimation = (start, duration, animation) => {
+  const time = TIME % 30;
+  if (time > start && time < start + duration) animation(time - start);
 };
 
 //------------------- Objects ------------------
