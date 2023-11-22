@@ -464,8 +464,8 @@ function gPush() {
 function render() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // const eye = vec3(-5, 6, 7);
-  const eye = vec3(-1, 4, 2);
+  const eye = vec3(-5, 6, 7);
+  // const eye = vec3(-1, 4, 2);
 
   // set the projection matrix
   u_projection = perspective(45, 1, near, far);
@@ -527,7 +527,7 @@ function render() {
     gTranslate(-2, 0.4, 0);
     gRotate(90, -1, 0, 0);
 
-    const segments = 9;
+    const segments = 10;
     const bark = ["#795c2e", textures.BARK];
 
     // Trunk
@@ -539,18 +539,21 @@ function render() {
 
     // Tree toppers
     newObj(() => {
-      gTranslate(1.5, 0, 4.75);
+      gTranslate(1.75, 0, 5);
       gRotate(90, 1, 0, -1);
 
       // Leaves
       const leafLength = 3;
       const numLeaves = 5;
-      [...Array(numLeaves).keys()].forEach((x) => {
-        newCube("#439804", textures.GRASS, () => {
-          gRotate((360 / numLeaves) * x, 0, 1, 0);
-          gRotate(Math.cos(TIME + x) * 10, 0, 0, 1);
-          gTranslate(leafLength / 3, 0, 0);
-          gScale(leafLength / 3, 0.01, 1 / leafLength);
+      [-15, 0, 30].forEach((x, i) => {
+        [...Array(numLeaves).keys()].forEach((y) => {
+          newTaperedCylinder("#439804", textures.GRASS, () => {
+            gRotate((360 / numLeaves) * y + 35 * i, 0, 1, 0);
+            gRotate(Math.cos(TIME + y) * 10 + x, 0, 0, 1);
+            gTranslate(leafLength / 3, 0, 0);
+            gRotate(90, 0, 1, 0);
+            gScale(leafLength / 3, 0.01, x / 10);
+          });
         });
       });
 
