@@ -463,11 +463,13 @@ const coconuts = [...Array(3).keys()].map((x) =>
   newCoconut(2 + (x % 2), -1.5 + (x % 2) / 2, x - 1)
 );
 
+const keyFrames = [0.85];
+
 function render() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  const eye = vec3(-5, 6, 7);
-  // const eye = vec3(-1, 4, 2);
+  // const eye = vec3(-5, 6, 7);
+  const eye = vec3(-1, 4, 2);
 
   // set the projection matrix
   u_projection = perspective(45, 1, near, far);
@@ -560,10 +562,12 @@ function render() {
       });
 
       // Coconuts
-      newAnimation(2, 0.85, (localTime) => {
-        coconuts[1].move(20 * localTime ** 2, 0, 0);
+      newAnimation(0, 0.85, (localTime) => {
+        coconuts[1].move(20 * localTime ** 2, 0, 0).draw();
       });
-      coconuts.forEach((e) => e.draw());
+      // coconuts[1].draw();
+      coconuts[0].draw();
+      coconuts[2].draw();
     });
   });
 
@@ -639,20 +643,20 @@ function render() {
     gScaleU(0.5);
     gTranslate(1, 4, 0);
 
-    const skin = [textures.SKIN];
+    const skin = textures.SKIN;
 
     // Shirt
-    const shirt = [textures.SQUIRRELS];
-    newTaperedCylinder(...shirt, () => {
+    const shirt = textures.SQUIRRELS;
+    newTaperedCylinder(shirt, () => {
       gTranslate(0, -0.3, -1.1);
       gRotate(-135, 1, 0, 0);
 
       // Shirt
-      newTaperedCylinder(...shirt, () => {
+      newTaperedCylinder(shirt, () => {
         gTranslate(0, 0, 0.8);
 
         // Neck
-        newTaperedCylinder(...skin, () => {
+        newTaperedCylinder(skin, () => {
           gTranslate(0, 0, 0.2);
           gScale(1, 0.65, 0.25);
         });
@@ -660,29 +664,80 @@ function render() {
         // Arms
         [-1, 1].forEach((e) => {
           // Sleeves
-          newTaperedCylinder(...shirt, () => {
+          newTaperedCylinder(shirt, () => {
             // Don't touch
             gRotate(90, 0, e, 0);
             gTranslate(e * 0.4, 0, 0.35);
 
-            // Move Upper arm
-            gRotate(45, (Math.cos(TIME) + 1) / 2, e, 0);
+            if (e === -1)
+              newAnimation(
+                0,
+                keyFrames[0],
+                (lt, progress) => {
+                  // Flys / Hugs
+                  gRotate(ease(progress, -10, -5), 1, 0, 0);
+                  // Lat raises
+                  gRotate(ease(progress, 0, 44), 0, e, 0);
+                },
+                () => {
+                  // Flys / Hugs
+                  gRotate(-5, 1, 0, 0);
+                  // Lat raises
+                  gRotate(44, 0, e, 0);
+                }
+              );
+            else {
+              gRotate(-7, 1, 0, 0);
+              // Lat raises
+              gRotate(20, 0, e, 0);
+            }
 
             // Don't touch
             gTranslate(0, 0, 0.5);
 
             // Upper arm
-            newTaperedCylinder(...skin, () => {
+            newTaperedCylinder(skin, () => {
               gTranslate(0, 0, 0.5);
 
               // Elbow
-              newSphere(...skin, () => {
+              newSphere(skin, () => {
                 gTranslate(0, 0, 0.25);
 
                 // Forearm
                 newTaperedCylinder(textures.DEFAULT, () => {
-                  gRotate(60 + Math.cos(TIME) * 30, 1, e, 0);
+                  if (e === -1)
+                    newAnimation(
+                      0,
+                      keyFrames[0],
+                      (lt, progress) => {
+                        // Bicep curls
+                        gRotate(ease(progress, 0, 56.5), 1, 0, 0);
+                      },
+                      () => {
+                        // Bicep curls
+                        gRotate(56.5, 1, 0, 0);
+                      }
+                    );
+                  else gRotate(56.5, 1, 0, 0);
+
                   gTranslate(0, 0, 0.5);
+
+                  // Hand
+                  newSphere(skin, () => {
+                    gTranslate(0, 0, 0.5);
+                    gRotate(60, 0, 0, 1);
+
+                    if (e === -1)
+                      newAnimation(keyFrames[0], 10, (lt) => {
+                        newObj(() => {
+                          gScaleU(2);
+                          gRotate(-20, 0, 1, 0);
+                          newCoconut(0, 0, 1.25).draw();
+                        });
+                      });
+
+                    gScaleU(0.15);
+                  });
 
                   gScale(0.3, 0.3, 1);
                 });
@@ -701,7 +756,7 @@ function render() {
       });
 
       // Head;
-      newSphere(...skin, () => {
+      newSphere(skin, () => {
         gTranslate(0, 0, 1.5);
 
         // Eyes
@@ -763,17 +818,17 @@ function render() {
             gTranslate(e / 3, 0, 0.85);
 
             // Legs - Bottom
-            newTaperedCylinder(...skin, () => {
+            newTaperedCylinder(skin, () => {
               gTranslate(0, 0, 1);
 
               // Feet
-              newSphere(...skin, () => {
+              newSphere(skin, () => {
                 gTranslate(0, 0.15, 0.65);
                 gRotate(15, 1, 0, -e);
 
                 // Toes
                 [1.75, 1, 1, 1, 1].forEach((t, i) => {
-                  newSphere(...skin, () => {
+                  newSphere(skin, () => {
                     gTranslate(
                       (e * (i - t)) / 25,
                       0.35 - Math.tan(i / 3) / 60,

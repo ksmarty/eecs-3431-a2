@@ -178,10 +178,15 @@ const setUniforms = () => {
  * @param {(localTime: number) => void} animation Animation function with "local time"
  * @returns
  */
-const newAnimation = (start, duration, animation) => {
+const newAnimation = (start, duration, animation, fixed = () => {}) => {
   const time = TIME % 30;
-  if (time > start && time < start + duration) animation(time - start);
+  const lt = time - start;
+  if (time >= start && time <= start + duration) animation(lt, lt / duration);
+  else fixed();
 };
+
+const ease = (x, start, end) =>
+  end + ((start - end) * (Math.cos(Math.PI * x) + 1)) / 2;
 
 //------------------- Objects ------------------
 
@@ -201,6 +206,7 @@ const newCoconut = (initX, initY, initZ) => ({
     this.offsets.x = x;
     this.offsets.y = y;
     this.offsets.z = z;
+    return this;
   },
   draw() {
     newObj(() => {
@@ -212,7 +218,7 @@ const newCoconut = (initX, initY, initZ) => ({
 
       newSphere(textures.COCONUT, () => {
         const numHoles = 3;
-        gRotate(90, 0, 0, 1);
+        // gRotate(90, 0, 0, 1);
         [...Array(numHoles).keys()].forEach((x) => {
           newSphere(textures.BLACK, () => {
             gRotate((x / numHoles) * 360, 0, 1, 0);
@@ -222,6 +228,7 @@ const newCoconut = (initX, initY, initZ) => ({
         });
       });
     });
+    return this;
   },
 });
 
