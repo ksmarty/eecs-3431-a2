@@ -464,7 +464,7 @@ const coconuts = [...Array(3).keys()].map((x) =>
   newCoconut(2 + (x % 2), -1.5 + (x % 2) / 2, x - 1)
 );
 
-const keyFrames = [0, 0.85, 2, 3, 4];
+const keyFrames = [0, 0.85, 2, 3, 4, 6, 7, 9, 10, 12, 13, 14, 14.25, 15, 16];
 
 function render() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -689,35 +689,87 @@ function render() {
             gTranslate(e * 0.4, 0, 0.35);
 
             if (isLeft) {
-              newAnimation([
-                {
-                  start: keyFrames[0],
-                  end: keyFrames[1],
-                  animation: (_, ease) => {
-                    gRotate(ease(20, -5), 1, 0, 0); // Flys / Hugs
-                    gRotate(ease(56, 44), 0, e, 0); // Lat raises
-                    gRotate(ease(-25, 0), 0, 0, 1); // Rotation
+              newAnimation(
+                [
+                  {
+                    start: keyFrames[1] / 2,
+                    end: keyFrames[1],
+                    animation: (_, ease) => {
+                      gRotate(ease(20, -5), 1, 0, 0); // Flys / Hugs
+                      gRotate(ease(56, 44), 0, e, 0); // Lat raises
+                      gRotate(ease(-25, 0), 0, 0, 1); // Rotation
+                    },
                   },
-                },
-                {
-                  start: keyFrames[1],
-                  end: keyFrames[2],
-                  animation: (_, ease) => {
-                    gRotate(ease(-5, 20), 1, 0, 0); // Flys
-                    gRotate(ease(44, 56), 0, e, 0); // Lat raises
-                    gRotate(ease(0, -30), 0, 0, 1); // Rotation
+                  {
+                    start: keyFrames[1],
+                    end: keyFrames[2],
+                    animation: (_, ease) => {
+                      gRotate(ease(-5, 20), 1, 0, 0); // Flys
+                      gRotate(ease(44, 56), 0, e, 0); // Lat raises
+                      gRotate(ease(0, -30), 0, 0, 1); // Rotation
+                    },
                   },
-                },
-                {
-                  start: keyFrames[3],
-                  end: keyFrames[4],
-                  animation: (_, ease) => {
-                    gRotate(ease(20, 35), 1, 0, 0); // Flys
-                    gRotate(ease(56, 0), 0, e, 0); // Lat raises
-                    gRotate(ease(-30, 7), 0, 0, 1); // Rotation
+                  {
+                    start: keyFrames[3],
+                    end: keyFrames[4],
+                    animation: (_, ease) => {
+                      gRotate(ease(20, 35), 1, 0, 0); // Flys
+                      gRotate(ease(56, 0), 0, e, 0); // Lat raises
+                      gRotate(ease(-30, 7), 0, 0, 1); // Rotation
+                    },
                   },
-                },
-              ]);
+                  {
+                    start: keyFrames[5],
+                    end: keyFrames[6],
+                    animation: (_, ease) => {
+                      gRotate(ease(35, 20), 1, 0, 0); // Flys
+                      gRotate(ease(0, 56), 0, e, 0); // Lat raises
+                      gRotate(ease(7, -30), 0, 0, 1); // Rotation
+                    },
+                  },
+                  {
+                    start: keyFrames[7],
+                    end: keyFrames[8],
+                    animation: (_, ease) => {
+                      gRotate(ease(20, 35), 1, 0, 0); // Flys
+                      gRotate(ease(56, 0), 0, e, 0); // Lat raises
+                      gRotate(ease(-30, 7), 0, 0, 1); // Rotation
+                    },
+                  },
+                  {
+                    start: keyFrames[9],
+                    end: keyFrames[10],
+                    animation: (_, ease) => {
+                      gRotate(ease(35, 20), 1, 0, 0); // Flys
+                      gRotate(ease(0, 56), 0, e, 0); // Lat raises
+                      gRotate(ease(7, -30), 0, 0, 1); // Rotation
+                    },
+                  },
+                  {
+                    start: keyFrames[11],
+                    end: keyFrames[12],
+                    ease: newEaseIn,
+                    animation: (_, ease) => {
+                      gRotate(ease(20, 35), 1, 0, 0); // Flys
+                      gRotate(ease(56, 0), 0, e, 0); // Lat raises
+                      gRotate(ease(-30, 40), 0, 0, 1); // Rotation
+                    },
+                  },
+                  {
+                    start: keyFrames[13],
+                    end: keyFrames[14],
+                    ease: newEaseIn,
+                    animation: (_, ease) => {
+                      gRotate(ease(35, 20), 1, 0, 0); // Flys
+                      gRotate(ease(0, 56), 0, e, 0); // Lat raises
+                      gRotate(ease(40, -30), 0, 0, 1); // Rotation
+                    },
+                  },
+                ],
+                {
+                  showBefore: true,
+                }
+              );
             } else {
               newAnimation(
                 [
@@ -739,6 +791,15 @@ function render() {
                       gRotate(ease(-90, 15), 0, 0, 1); // Rotation
                     },
                   },
+                  {
+                    start: keyFrames[3],
+                    end: keyFrames[4],
+                    animation: (_, ease) => {
+                      gRotate(ease(65, 20), 1, 0, 0); // Flys
+                      gRotate(ease(35, 56), 0, 1, 0); // Lat raises
+                      gRotate(ease(15, 25), 0, 0, 1); // Rotation
+                    },
+                  },
                 ],
                 { showBefore: true }
               );
@@ -758,29 +819,55 @@ function render() {
                 // Forearm
                 newTaperedCylinder(textures.SKIN, () => {
                   if (isLeft) {
-                    newAnimation([
-                      {
-                        start: keyFrames[0],
-                        end: keyFrames[1],
-                        animation: (_, ease) => {
-                          gRotate(ease(80, 56.5), 1, 0, 0); // Bicep curls
+                    newAnimation(
+                      [
+                        {
+                          start: keyFrames[1] / 2,
+                          end: keyFrames[1],
+                          animation: (_, ease) => {
+                            gRotate(ease(80, 56.5), 1, 0, 0); // Bicep curls
+                          },
                         },
-                      },
-                      {
-                        start: keyFrames[1],
-                        end: keyFrames[2],
-                        animation: (_, ease) => {
-                          gRotate(ease(56.5, 85), 1, 0, 0); // Bicep curls
+                        {
+                          start: keyFrames[1],
+                          end: keyFrames[2],
+                          animation: (_, ease) => {
+                            gRotate(ease(56.5, 85), 1, 0, 0); // Bicep curls
+                          },
                         },
-                      },
-                      {
-                        start: keyFrames[3],
-                        end: keyFrames[4],
-                        animation: (_, ease) => {
-                          gRotate(ease(85, 130), 1, 0, 0); // Bicep curls
+                        {
+                          start: keyFrames[3],
+                          end: keyFrames[4],
+                          animation: (_, ease) => {
+                            gRotate(ease(85, 130), 1, 0, 0); // Bicep curls
+                          },
                         },
-                      },
-                    ]);
+                        {
+                          start: keyFrames[5],
+                          end: keyFrames[6],
+                          animation: (_, ease) => {
+                            gRotate(ease(130, 85), 1, 0, 0); // Bicep curls
+                          },
+                        },
+                        {
+                          start: keyFrames[7],
+                          end: keyFrames[8],
+                          animation: (_, ease) => {
+                            gRotate(ease(85, 130), 1, 0, 0); // Bicep curls
+                          },
+                        },
+                        {
+                          start: keyFrames[9],
+                          end: keyFrames[10],
+                          animation: (_, ease) => {
+                            gRotate(ease(130, 85), 1, 0, 0); // Bicep curls
+                          },
+                        },
+                      ],
+                      {
+                        showBefore: true,
+                      }
+                    );
                   } else {
                     newAnimation(
                       [
@@ -812,41 +899,74 @@ function render() {
                     gTranslate(0, 0, 0.5);
 
                     if (isLeft) {
-                      newAnimation([
-                        {
-                          start: keyFrames[0],
-                          end: keyFrames[1],
-                          animation: () => {
-                            gRotate(180, 0, 0, 1);
+                      newAnimation(
+                        [
+                          {
+                            start: keyFrames[0],
+                            end: keyFrames[1],
+                            animation: () => {
+                              gRotate(180, 0, 0, 1);
+                            },
                           },
-                        },
-                        {
-                          start: keyFrames[1],
-                          end: keyFrames[2],
-                          animation: (_, ease) => {
-                            gRotate(ease(180, 90), 0, 0, 1);
-                            newObj(() => {
-                              gScaleU(2);
-                              gRotate(-20, 0, 1, 0);
-                              newCoconut(0, 0, 1.25).draw();
-                            });
+                          {
+                            start: keyFrames[1],
+                            end: keyFrames[2],
+                            animation: (_, ease) => {
+                              gRotate(ease(180, 90), 0, 0, 1);
+                              newObj(() => {
+                                gScaleU(2);
+                                gRotate(-20, 0, 1, 0);
+                                newCoconut(0, 0, 1.25).draw();
+                              });
+                            },
                           },
-                        },
-                        {
-                          start: keyFrames[3],
-                          end: keyFrames[4],
-                          animation: (_, ease) => {
-                            gRotate(ease(90, 120), 0, 0, 1);
-                            gRotate(ease(0, -25), 1, 0, 0);
-                            newObj(() => {
-                              gScaleU(2);
-                              gRotate(-20, 0, 1, 0);
-                              newCoconut(0, 0, 1.25).draw();
-                              drawStraw();
-                            });
+                          {
+                            start: keyFrames[3],
+                            end: keyFrames[4],
+                            animation: (_, ease) => {
+                              gRotate(ease(90, 120), 0, 0, 1);
+                              gRotate(ease(0, -25), 1, 0, 0);
+                              newObj(() => {
+                                gScaleU(2);
+                                gRotate(-20, 0, 1, 0);
+                                newCoconut(0, 0, 1.25).draw();
+                                drawStraw();
+                              });
+                            },
                           },
-                        },
-                      ]);
+                          {
+                            start: keyFrames[11],
+                            end: keyFrames[12],
+                            animation: (lt, ease) => {
+                              gRotate(ease(120, 155), 0, 0, 1);
+                              gRotate(ease(-25, 0), 1, 0, 0);
+                              newObj(() => {
+                                gScaleU(2);
+                                gRotate(-20, 0, 1, 0);
+                                newCoconut(0, 0, 1.25).draw();
+                                drawStraw();
+                              });
+                            },
+                          },
+                          {
+                            start: keyFrames[12],
+                            end: keyFrames[13],
+                            animation: (lt) => {
+                              gRotate(155, 0, 0, 1);
+                              newObj(() => {
+                                gTranslate(-lt * 20, 0, -20 * lt ** 2 + 5 * lt);
+                                gScaleU(2);
+                                gRotate(-20, 0, 1, 0);
+                                newCoconut(0, 0, 1.25).draw();
+                                drawStraw();
+                              });
+                            },
+                          },
+                        ],
+                        {
+                          showAfter: false,
+                        }
+                      );
                     } else {
                       newAnimation(
                         [

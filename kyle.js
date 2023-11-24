@@ -177,12 +177,14 @@ const setUniforms = () => {
  * @callback AnimationFunction
  * @param {number} localTime The time starting from `start`
  * @param {() => number} ease The easing function based on the animation interval
+ * @returns {void}
  */
 
 /**
  * @typedef {Object} AnimationElement
  * @property {number} start Start time
  * @property {number} end End time
+ * @property {Function} ease Easing function to use
  * @property {AnimationFunction} animation Animation function
  */
 
@@ -193,7 +195,7 @@ const setUniforms = () => {
  */
 
 /**
- *
+ * Create a new animation
  * @param {AnimationElement[]} animations
  * @param {AnimationOptions} options
  */
@@ -201,20 +203,26 @@ const newAnimation = (
   animations,
   { showBefore = false, showAfter = true } = {}
 ) => {
-  animations.forEach(({ start, end, animation }, i) => {
-    const time = TIME % 30;
-    // const time = 4;
+  const startAt = 14;
+  const startOffset = 0;
+  const slowDown = 1;
+
+  animations.forEach(({ start, end, animation, ease = newEaseInOut }, i) => {
+    const time = ((TIME - startOffset) / slowDown + startAt) % 30;
     const lt = time - start;
     const duration = end - start;
+    const isLast = i === animations.length - 1;
     const status = {
       before: i === 0 && showBefore && time < start,
       during: time >= start && time <= end,
       after:
-        ((i === animations.length - 1 && showAfter) ||
-          (animations.length > 1 && time < animations[i + 1].start)) &&
+        ((isLast && showAfter) ||
+          (!isLast &&
+            animations.length > 1 &&
+            time < animations[i + 1].start)) &&
         time > end,
     };
-    const easeGen = (x) => (s, e) => newEase(x, s, e);
+    const easeGen = (x) => (s, e) => ease(x, s, e);
     if (status.before) animation(0, easeGen(0));
     else if (status.during) animation(lt, easeGen(lt / duration));
     else if (status.after) animation(duration, easeGen(1));
@@ -222,14 +230,24 @@ const newAnimation = (
 };
 
 /**
- * Ease between two numbers
+ * Ease in & out between two numbers
  * @param {number} x Normalized progress in [0,1]
  * @param {number} start Value when x = 0
  * @param {number} end Value when x = 1
  * @returns Number in range from `start` to `end`
  */
-const newEase = (x, start, end) =>
+const newEaseInOut = (x, start, end) =>
   end + ((start - end) * (Math.cos(Math.PI * x) + 1)) / 2;
+
+/**
+ * Ease in between two numbers
+ * @param {number} x Normalized progress in [0,1]
+ * @param {number} start Value when x = 0
+ * @param {number} end Value when x = 1
+ * @returns Number in range from `start` to `end`
+ */
+const newEaseIn = (x, start, end) =>
+  start + (end - start) * (1 - Math.cos((x * Math.PI) / 2));
 
 //------------------- Objects ------------------
 

@@ -10,10 +10,4 @@ Water shader courtesy of https://www.shadertoy.com/view/ts2yzW
 
 Eye texture courtesy of https://www.3dxo.com/textures/5906_eye_blue
 
-## Idea
-
-Desert island
-palm tree
-guy sitting drinking out of a coconut with a straw
-water shader
-coconut texture
+Easing functions modified from https://easings.net/
