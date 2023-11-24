@@ -464,19 +464,99 @@ const coconuts = [...Array(3).keys()].map((x) =>
   newCoconut(2 + (x % 2), -1.5 + (x % 2) / 2, x - 1)
 );
 
-const keyFrames = [0, 0.85, 2, 3, 4, 6, 7, 9, 10, 12, 13, 14, 14.25, 15, 16];
+const startOffset = 8;
+const keyFrames = [
+  0, 0.85, 2, 3, 4, 6, 7, 9, 10, 12, 13, 14, 14.25, 15, 16,
+].map((e) => e + startOffset);
 
 function render() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  const eye = vec3(-5, 6, 7);
-  // const eye = vec3(-1, 4, 2);
+  let at = vec3(2, 0, -4);
+  let eye = vec3(-5, 6, 7);
+
+  /**
+   * @typedef {Object} Camera
+   * @property {vec3} at Looking at vector
+   * @property {vec3} eye Eye location vector
+   */
+
+  /**
+   * Set the camera location
+   * @param {Camera} camera
+   */
+  const setCamera = (camera) => {
+    at = camera.at;
+    eye = camera.eye;
+  };
+
+  // Camera animations
+  newAnimation(
+    [
+      {
+        start: 0,
+        end: 2,
+        animation: (_, { easeIn }) => {
+          setCamera({
+            at: vec3(0, easeIn(-50, -10), 0),
+            eye: vec3(0, easeIn(2, 10), easeIn(-100, -50)),
+          });
+          Rotations.y = 0;
+        },
+      },
+      {
+        start: 2,
+        end: 6,
+        animation: (_, { easeInOut, easeOut }) => {
+          setCamera({
+            at: vec3(0, easeOut(-10, 3), 0),
+            eye: vec3(0, easeOut(10, 7), easeOut(-50, -10)),
+          });
+          Rotations.y = easeInOut(0, -210);
+        },
+      },
+      {
+        start: 8,
+        end: 9,
+        animation: (_, { easeInOut }) => {
+          setCamera({
+            at: vec3(0, 3, 0),
+            eye: vec3(0, easeInOut(7, 5), easeInOut(-10, -5)),
+          });
+          Rotations.y = -210;
+        },
+      },
+      {
+        start: 26,
+        end: 29,
+        animation: (_, { easeInOut, easeIn }) => {
+          setCamera({
+            at: vec3(0, easeIn(3, -10), easeInOut(0, 80)),
+            eye: vec3(0, easeIn(5, 1), easeIn(-5, 50)),
+          });
+          Rotations.y = -210;
+        },
+      },
+      {
+        start: 29,
+        end: 30,
+        animation: (_, { easeOut }) => {
+          setCamera({
+            at: vec3(0, easeOut(-10, -10), 80),
+            eye: vec3(0, easeOut(1, 3), easeOut(50, 80)),
+          });
+          Rotations.y = -210;
+        },
+      },
+    ],
+    {
+      showBefore: true,
+    }
+  );
 
   // set the projection matrix
   u_projection = perspective(45, 1, near, far);
-  // u_projection = ortho(left, right, bottom, ytop, near, far);
 
-  const at = vec3(2, 0, -4);
   const up = vec3(0.0, 1.0, 0.0);
 
   // set the camera matrix
@@ -692,77 +772,75 @@ function render() {
               newAnimation(
                 [
                   {
-                    start: keyFrames[1] / 2,
+                    start: keyFrames[1] - 0.4,
                     end: keyFrames[1],
-                    animation: (_, ease) => {
-                      gRotate(ease(20, -5), 1, 0, 0); // Flys / Hugs
-                      gRotate(ease(56, 44), 0, e, 0); // Lat raises
-                      gRotate(ease(-25, 0), 0, 0, 1); // Rotation
+                    animation: (_, { easeInOut }) => {
+                      gRotate(easeInOut(20, -5), 1, 0, 0); // Flys / Hugs
+                      gRotate(easeInOut(56, 44), 0, e, 0); // Lat raises
+                      gRotate(easeInOut(-25, 0), 0, 0, 1); // Rotation
                     },
                   },
                   {
                     start: keyFrames[1],
                     end: keyFrames[2],
-                    animation: (_, ease) => {
-                      gRotate(ease(-5, 20), 1, 0, 0); // Flys
-                      gRotate(ease(44, 56), 0, e, 0); // Lat raises
-                      gRotate(ease(0, -30), 0, 0, 1); // Rotation
+                    animation: (_, { easeInOut }) => {
+                      gRotate(easeInOut(-5, 20), 1, 0, 0); // Flys
+                      gRotate(easeInOut(44, 56), 0, e, 0); // Lat raises
+                      gRotate(easeInOut(0, -30), 0, 0, 1); // Rotation
                     },
                   },
                   {
                     start: keyFrames[3],
                     end: keyFrames[4],
-                    animation: (_, ease) => {
-                      gRotate(ease(20, 35), 1, 0, 0); // Flys
-                      gRotate(ease(56, 0), 0, e, 0); // Lat raises
-                      gRotate(ease(-30, 7), 0, 0, 1); // Rotation
+                    animation: (_, { easeInOut }) => {
+                      gRotate(easeInOut(20, 35), 1, 0, 0); // Flys
+                      gRotate(easeInOut(56, 0), 0, e, 0); // Lat raises
+                      gRotate(easeInOut(-30, 7), 0, 0, 1); // Rotation
                     },
                   },
                   {
                     start: keyFrames[5],
                     end: keyFrames[6],
-                    animation: (_, ease) => {
-                      gRotate(ease(35, 20), 1, 0, 0); // Flys
-                      gRotate(ease(0, 56), 0, e, 0); // Lat raises
-                      gRotate(ease(7, -30), 0, 0, 1); // Rotation
+                    animation: (_, { easeInOut }) => {
+                      gRotate(easeInOut(35, 20), 1, 0, 0); // Flys
+                      gRotate(easeInOut(0, 56), 0, e, 0); // Lat raises
+                      gRotate(easeInOut(7, -30), 0, 0, 1); // Rotation
                     },
                   },
                   {
                     start: keyFrames[7],
                     end: keyFrames[8],
-                    animation: (_, ease) => {
-                      gRotate(ease(20, 35), 1, 0, 0); // Flys
-                      gRotate(ease(56, 0), 0, e, 0); // Lat raises
-                      gRotate(ease(-30, 7), 0, 0, 1); // Rotation
+                    animation: (_, { easeInOut }) => {
+                      gRotate(easeInOut(20, 35), 1, 0, 0); // Flys
+                      gRotate(easeInOut(56, 0), 0, e, 0); // Lat raises
+                      gRotate(easeInOut(-30, 7), 0, 0, 1); // Rotation
                     },
                   },
                   {
                     start: keyFrames[9],
                     end: keyFrames[10],
-                    animation: (_, ease) => {
-                      gRotate(ease(35, 20), 1, 0, 0); // Flys
-                      gRotate(ease(0, 56), 0, e, 0); // Lat raises
-                      gRotate(ease(7, -30), 0, 0, 1); // Rotation
+                    animation: (_, { easeInOut }) => {
+                      gRotate(easeInOut(35, 20), 1, 0, 0); // Flys
+                      gRotate(easeInOut(0, 56), 0, e, 0); // Lat raises
+                      gRotate(easeInOut(7, -30), 0, 0, 1); // Rotation
                     },
                   },
                   {
                     start: keyFrames[11],
                     end: keyFrames[12],
-                    ease: newEaseIn,
-                    animation: (_, ease) => {
-                      gRotate(ease(20, 35), 1, 0, 0); // Flys
-                      gRotate(ease(56, 0), 0, e, 0); // Lat raises
-                      gRotate(ease(-30, 40), 0, 0, 1); // Rotation
+                    animation: (_, { easeIn }) => {
+                      gRotate(easeIn(20, 35), 1, 0, 0); // Flys
+                      gRotate(easeIn(56, 0), 0, e, 0); // Lat raises
+                      gRotate(easeIn(-30, 40), 0, 0, 1); // Rotation
                     },
                   },
                   {
                     start: keyFrames[13],
                     end: keyFrames[14],
-                    ease: newEaseIn,
-                    animation: (_, ease) => {
-                      gRotate(ease(35, 20), 1, 0, 0); // Flys
-                      gRotate(ease(0, 56), 0, e, 0); // Lat raises
-                      gRotate(ease(40, -30), 0, 0, 1); // Rotation
+                    animation: (_, { easeIn }) => {
+                      gRotate(easeIn(35, 20), 1, 0, 0); // Flys
+                      gRotate(easeIn(0, 56), 0, e, 0); // Lat raises
+                      gRotate(easeIn(40, -30), 0, 0, 1); // Rotation
                     },
                   },
                 ],
@@ -776,28 +854,28 @@ function render() {
                   {
                     start: keyFrames[1],
                     end: keyFrames[2],
-                    animation: (_, ease) => {
-                      gRotate(ease(20, 40), 1, 0, 0); // Flys
-                      gRotate(ease(56, -40), 0, 1, 0); // Lat raises
-                      gRotate(ease(25, -90), 0, 0, 1); // Rotation
+                    animation: (_, { easeInOut }) => {
+                      gRotate(easeInOut(20, 40), 1, 0, 0); // Flys
+                      gRotate(easeInOut(56, -40), 0, 1, 0); // Lat raises
+                      gRotate(easeInOut(25, -90), 0, 0, 1); // Rotation
                     },
                   },
                   {
                     start: keyFrames[2],
                     end: keyFrames[3],
-                    animation: (_, ease) => {
-                      gRotate(ease(40, 65), 1, 0, 0); // Flys
-                      gRotate(ease(-40, 35), 0, 1, 0); // Lat raises
-                      gRotate(ease(-90, 15), 0, 0, 1); // Rotation
+                    animation: (_, { easeInOut }) => {
+                      gRotate(easeInOut(40, 65), 1, 0, 0); // Flys
+                      gRotate(easeInOut(-40, 35), 0, 1, 0); // Lat raises
+                      gRotate(easeInOut(-90, 15), 0, 0, 1); // Rotation
                     },
                   },
                   {
                     start: keyFrames[3],
                     end: keyFrames[4],
-                    animation: (_, ease) => {
-                      gRotate(ease(65, 20), 1, 0, 0); // Flys
-                      gRotate(ease(35, 56), 0, 1, 0); // Lat raises
-                      gRotate(ease(15, 25), 0, 0, 1); // Rotation
+                    animation: (_, { easeInOut }) => {
+                      gRotate(easeInOut(65, 20), 1, 0, 0); // Flys
+                      gRotate(easeInOut(35, 56), 0, 1, 0); // Lat raises
+                      gRotate(easeInOut(15, 25), 0, 0, 1); // Rotation
                     },
                   },
                 ],
@@ -822,45 +900,45 @@ function render() {
                     newAnimation(
                       [
                         {
-                          start: keyFrames[1] / 2,
+                          start: keyFrames[1] - 0.4,
                           end: keyFrames[1],
-                          animation: (_, ease) => {
-                            gRotate(ease(80, 56.5), 1, 0, 0); // Bicep curls
+                          animation: (_, { easeInOut }) => {
+                            gRotate(easeInOut(80, 56.5), 1, 0, 0); // Bicep curls
                           },
                         },
                         {
                           start: keyFrames[1],
                           end: keyFrames[2],
-                          animation: (_, ease) => {
-                            gRotate(ease(56.5, 85), 1, 0, 0); // Bicep curls
+                          animation: (_, { easeInOut }) => {
+                            gRotate(easeInOut(56.5, 85), 1, 0, 0); // Bicep curls
                           },
                         },
                         {
                           start: keyFrames[3],
                           end: keyFrames[4],
-                          animation: (_, ease) => {
-                            gRotate(ease(85, 130), 1, 0, 0); // Bicep curls
+                          animation: (_, { easeInOut }) => {
+                            gRotate(easeInOut(85, 130), 1, 0, 0); // Bicep curls
                           },
                         },
                         {
                           start: keyFrames[5],
                           end: keyFrames[6],
-                          animation: (_, ease) => {
-                            gRotate(ease(130, 85), 1, 0, 0); // Bicep curls
+                          animation: (_, { easeInOut }) => {
+                            gRotate(easeInOut(130, 85), 1, 0, 0); // Bicep curls
                           },
                         },
                         {
                           start: keyFrames[7],
                           end: keyFrames[8],
-                          animation: (_, ease) => {
-                            gRotate(ease(85, 130), 1, 0, 0); // Bicep curls
+                          animation: (_, { easeInOut }) => {
+                            gRotate(easeInOut(85, 130), 1, 0, 0); // Bicep curls
                           },
                         },
                         {
                           start: keyFrames[9],
                           end: keyFrames[10],
-                          animation: (_, ease) => {
-                            gRotate(ease(130, 85), 1, 0, 0); // Bicep curls
+                          animation: (_, { easeInOut }) => {
+                            gRotate(easeInOut(130, 85), 1, 0, 0); // Bicep curls
                           },
                         },
                       ],
@@ -874,15 +952,15 @@ function render() {
                         {
                           start: keyFrames[1],
                           end: keyFrames[2],
-                          animation: (_, ease) => {
-                            gRotate(ease(80, 100), 1, 0, 0); // Bicep curls
+                          animation: (_, { easeInOut }) => {
+                            gRotate(easeInOut(80, 100), 1, 0, 0); // Bicep curls
                           },
                         },
                         {
                           start: keyFrames[2],
                           end: keyFrames[3],
-                          animation: (_, ease) => {
-                            gRotate(ease(100, 70), 1, 0, 0); // Bicep curls
+                          animation: (_, { easeInOut }) => {
+                            gRotate(easeInOut(100, 70), 1, 0, 0); // Bicep curls
                           },
                         },
                       ],
@@ -911,8 +989,8 @@ function render() {
                           {
                             start: keyFrames[1],
                             end: keyFrames[2],
-                            animation: (_, ease) => {
-                              gRotate(ease(180, 90), 0, 0, 1);
+                            animation: (_, { easeInOut }) => {
+                              gRotate(easeInOut(180, 90), 0, 0, 1);
                               newObj(() => {
                                 gScaleU(2);
                                 gRotate(-20, 0, 1, 0);
@@ -923,9 +1001,9 @@ function render() {
                           {
                             start: keyFrames[3],
                             end: keyFrames[4],
-                            animation: (_, ease) => {
-                              gRotate(ease(90, 120), 0, 0, 1);
-                              gRotate(ease(0, -25), 1, 0, 0);
+                            animation: (_, { easeInOut }) => {
+                              gRotate(easeInOut(90, 120), 0, 0, 1);
+                              gRotate(easeInOut(0, -25), 1, 0, 0);
                               newObj(() => {
                                 gScaleU(2);
                                 gRotate(-20, 0, 1, 0);
@@ -937,9 +1015,9 @@ function render() {
                           {
                             start: keyFrames[11],
                             end: keyFrames[12],
-                            animation: (lt, ease) => {
-                              gRotate(ease(120, 155), 0, 0, 1);
-                              gRotate(ease(-25, 0), 1, 0, 0);
+                            animation: (_, { easeInOut }) => {
+                              gRotate(easeInOut(120, 155), 0, 0, 1);
+                              gRotate(easeInOut(-25, 0), 1, 0, 0);
                               newObj(() => {
                                 gScaleU(2);
                                 gRotate(-20, 0, 1, 0);

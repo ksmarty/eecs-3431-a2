@@ -176,15 +176,28 @@ const setUniforms = () => {
 /**
  * @callback AnimationFunction
  * @param {number} localTime The time starting from `start`
- * @param {() => number} ease The easing function based on the animation interval
+ * @param {Easing} ease Easing functions
  * @returns {void}
+ */
+
+/**
+ * @callback GeneratedEase
+ * @param {number} start Value when x = 0
+ * @param {number} end Value when x = 1
+ */
+
+/**
+ * @typedef Easing
+ * @property {GeneratedEase} easeIn
+ * @property {GeneratedEase} easeOut
+ * @property {GeneratedEase} easeInOut
+ * @property {GeneratedEase} linear
  */
 
 /**
  * @typedef {Object} AnimationElement
  * @property {number} start Start time
  * @property {number} end End time
- * @property {Function} ease Easing function to use
  * @property {AnimationFunction} animation Animation function
  */
 
@@ -203,12 +216,11 @@ const newAnimation = (
   animations,
   { showBefore = false, showAfter = true } = {}
 ) => {
-  const startAt = 14;
-  const startOffset = 0;
+  const startAt = 24;
   const slowDown = 1;
 
-  animations.forEach(({ start, end, animation, ease = newEaseInOut }, i) => {
-    const time = ((TIME - startOffset) / slowDown + startAt) % 30;
+  animations.forEach(({ start, end, animation }, i) => {
+    const time = (TIME / slowDown + startAt) % 30; // Loop every 30s
     const lt = time - start;
     const duration = end - start;
     const isLast = i === animations.length - 1;
@@ -222,7 +234,12 @@ const newAnimation = (
             time < animations[i + 1].start)) &&
         time > end,
     };
-    const easeGen = (x) => (s, e) => ease(x, s, e);
+    const easeGen = (x) => ({
+      easeIn: (s, e) => newEaseIn(x, s, e),
+      easeOut: (s, e) => newEaseOut(x, s, e),
+      easeInOut: (s, e) => newEaseInOut(x, s, e),
+      linear: (s, e) => newLinear(x, s, e),
+    });
     if (status.before) animation(0, easeGen(0));
     else if (status.during) animation(lt, easeGen(lt / duration));
     else if (status.after) animation(duration, easeGen(1));
@@ -248,6 +265,11 @@ const newEaseInOut = (x, start, end) =>
  */
 const newEaseIn = (x, start, end) =>
   start + (end - start) * (1 - Math.cos((x * Math.PI) / 2));
+
+const newEaseOut = (x, start, end) =>
+  start + (end - start) * Math.sin((x * Math.PI) / 2);
+
+const newLinear = (x, start, end) => start + (end - start) * x;
 
 //------------------- Objects ------------------
 
