@@ -186,7 +186,7 @@ const setUniforms = () => {
  */
 const newAnimation = (start, end, animations) => {
   const time = TIME % 30;
-  // const time = 3;
+  // const time = 4;
   const lt = time - start;
   const duration = end - start;
   const status = {

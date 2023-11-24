@@ -697,8 +697,8 @@ function render() {
               newAnimation(keyFrames[3], keyFrames[4], {
                 animations: (_, ease) => {
                   gRotate(ease(20, 35), 1, 0, 0); // Flys
-                  gRotate(ease(56, -40), 0, e, 0); // Lat raises
-                  gRotate(ease(-30, 15), 0, 0, 1); // Rotation
+                  gRotate(ease(56, 0), 0, e, 0); // Lat raises
+                  gRotate(ease(-30, 7), 0, 0, 1); // Rotation
                 },
                 showAfter: true,
               });
@@ -743,6 +743,16 @@ function render() {
                     newAnimation(keyFrames[1], keyFrames[2], {
                       animations: (_, ease) => {
                         gRotate(ease(56.5, 85), 1, 0, 0); // Bicep curls
+                      },
+                    });
+                    newAnimation(keyFrames[2], keyFrames[3], {
+                      animations: () => {
+                        gRotate(85, 1, 0, 0); // Bicep curls
+                      },
+                    });
+                    newAnimation(keyFrames[3], keyFrames[4], {
+                      animations: (_, ease) => {
+                        gRotate(ease(85, 130), 1, 0, 0); // Bicep curls
                       },
                       showAfter: true,
                     });
@@ -795,8 +805,9 @@ function render() {
                         },
                       });
                       newAnimation(keyFrames[3], keyFrames[4], {
-                        animations: () => {
-                          gRotate(90, 0, 0, 1);
+                        animations: (_, ease) => {
+                          gRotate(ease(90, 120), 0, 0, 1);
+                          gRotate(ease(0, -25), 1, 0, 0);
                           newObj(() => {
                             gScaleU(2);
                             gRotate(-20, 0, 1, 0);
