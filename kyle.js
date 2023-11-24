@@ -4,6 +4,8 @@
  *
  **********************************************************************/
 
+"use strict";
+
 /**
  * Draws a cylinder along z axis of height 1 centered at the origin and radius 0.5.
  * Sets the modelview and normal matrices of the global program.
@@ -172,34 +174,51 @@ const setUniforms = () => {
 };
 
 /**
- * @typedef {Object} Animations
- * @property {boolean} showBefore Show static animations before
- * @property {boolean} showAfter Show static animations after
- * @property {(localTime: number, ease: any) => void} animations Animations to run
+ * @callback AnimationFunction
+ * @param {number} localTime The time starting from `start`
+ * @param {() => number} ease The easing function based on the animation interval
  */
 
 /**
- * Animate between two keyframes
- * @param {number} start Start time
- * @param {number} end End time
- * @param {Animations} animations Animations object
+ * @typedef {Object} AnimationT
+ * @property {number} start Start time
+ * @property {number} end End time
+ * @property {AnimationFunction} animation Animation function
  */
-const newAnimation = (start, end, animations) => {
-  const time = TIME % 30;
-  // const time = 4;
-  const lt = time - start;
-  const duration = end - start;
-  const status = {
-    before: time < start,
-    during: time >= start && time <= end,
-    after: time > end,
-  };
-  const easeGen = (x) => (s, e) => newEase(x, s, e);
-  if (status.before && animations.showBefore)
-    animations.animations(0, easeGen(0));
-  else if (status.during) animations.animations(lt, easeGen(lt / duration));
-  else if (status.after && animations.showAfter)
-    animations.animations(duration, easeGen(1));
+
+/**
+ * @typedef {Object} AnimationOptions
+ * @property {boolean} showBefore Play first animation before `start` with `t=0`
+ * @property {boolean} showAfter Play last animation after `end` with `t=1`
+ */
+
+/**
+ *
+ * @param {AnimationT[]} animations
+ * @param {AnimationOptions} options
+ */
+const newAnimation = (
+  animations,
+  { showBefore = false, showAfter = true } = {}
+) => {
+  animations.forEach(({ start, end, animation }, i) => {
+    const time = TIME % 30;
+    // const time = 4;
+    const lt = time - start;
+    const duration = end - start;
+    const status = {
+      before: i === 0 && showBefore && time < start,
+      during: time >= start && time <= end,
+      after:
+        ((i === animations.length - 1 && showAfter) ||
+          (animations.length > 1 && time < animations[i + 1].start)) &&
+        time > end,
+    };
+    const easeGen = (x) => (s, e) => newEase(x, s, e);
+    if (status.before) animation(0, easeGen(0));
+    else if (status.during) animation(lt, easeGen(lt / duration));
+    else if (status.after) animation(duration, easeGen(1));
+  });
 };
 
 /**

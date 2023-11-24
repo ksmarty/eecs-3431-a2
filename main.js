@@ -563,11 +563,20 @@ function render() {
       });
 
       // Coconuts
-      newAnimation(0, 0.85, {
-        animations: (localTime) => {
-          coconuts[1].move(20 * localTime ** 2, 0, 0).draw();
-        },
-      });
+      newAnimation(
+        [
+          {
+            start: keyFrames[0],
+            end: keyFrames[1],
+            animation: (lt) => {
+              coconuts[1].move(20 * lt ** 2, 0, 0).draw();
+            },
+          },
+        ],
+        {
+          showAfter: false,
+        }
+      );
       coconuts[0].draw();
       coconuts[2].draw();
     });
@@ -673,52 +682,59 @@ function render() {
             gTranslate(e * 0.4, 0, 0.35);
 
             if (isLeft) {
-              newAnimation(keyFrames[0], keyFrames[1], {
-                animations: (_, ease) => {
-                  gRotate(ease(20, -5), 1, 0, 0); // Flys / Hugs
-                  gRotate(ease(56, 44), 0, e, 0); // Lat raises
-                  gRotate(ease(-25, 0), 0, 0, 1); // Rotation
+              newAnimation([
+                {
+                  start: keyFrames[0],
+                  end: keyFrames[1],
+                  animation: (_, ease) => {
+                    gRotate(ease(20, -5), 1, 0, 0); // Flys / Hugs
+                    gRotate(ease(56, 44), 0, e, 0); // Lat raises
+                    gRotate(ease(-25, 0), 0, 0, 1); // Rotation
+                  },
                 },
-              });
-              newAnimation(keyFrames[1], keyFrames[2], {
-                animations: (_, ease) => {
-                  gRotate(ease(-5, 20), 1, 0, 0); // Flys
-                  gRotate(ease(44, 56), 0, e, 0); // Lat raises
-                  gRotate(ease(0, -30), 0, 0, 1); // Rotation
+                {
+                  start: keyFrames[1],
+                  end: keyFrames[2],
+                  animation: (_, ease) => {
+                    gRotate(ease(-5, 20), 1, 0, 0); // Flys
+                    gRotate(ease(44, 56), 0, e, 0); // Lat raises
+                    gRotate(ease(0, -30), 0, 0, 1); // Rotation
+                  },
                 },
-              });
-              newAnimation(keyFrames[2], keyFrames[3], {
-                animations: (_, ease) => {
-                  gRotate(20, 1, 0, 0); // Flys
-                  gRotate(56, 0, e, 0); // Lat raises
-                  gRotate(-30, 0, 0, 1); // Rotation
+                {
+                  start: keyFrames[3],
+                  end: keyFrames[4],
+                  animation: (_, ease) => {
+                    gRotate(ease(20, 35), 1, 0, 0); // Flys
+                    gRotate(ease(56, 0), 0, e, 0); // Lat raises
+                    gRotate(ease(-30, 7), 0, 0, 1); // Rotation
+                  },
                 },
-              });
-              newAnimation(keyFrames[3], keyFrames[4], {
-                animations: (_, ease) => {
-                  gRotate(ease(20, 35), 1, 0, 0); // Flys
-                  gRotate(ease(56, 0), 0, e, 0); // Lat raises
-                  gRotate(ease(-30, 7), 0, 0, 1); // Rotation
-                },
-                showAfter: true,
-              });
+              ]);
             } else {
-              newAnimation(keyFrames[1], keyFrames[2], {
-                showBefore: true,
-                animations: (_, ease) => {
-                  gRotate(ease(20, 40), 1, 0, 0); // Flys
-                  gRotate(ease(56, -40), 0, 1, 0); // Lat raises
-                  gRotate(ease(25, -90), 0, 0, 1); // Rotation
-                },
-              });
-              newAnimation(keyFrames[2], keyFrames[3], {
-                animations: (_, ease) => {
-                  gRotate(ease(40, 65), 1, 0, 0); // Flys
-                  gRotate(ease(-40, 35), 0, 1, 0); // Lat raises
-                  gRotate(ease(-90, 15), 0, 0, 1); // Rotation
-                },
-                showAfter: true,
-              });
+              newAnimation(
+                [
+                  {
+                    start: keyFrames[1],
+                    end: keyFrames[2],
+                    animation: (_, ease) => {
+                      gRotate(ease(20, 40), 1, 0, 0); // Flys
+                      gRotate(ease(56, -40), 0, 1, 0); // Lat raises
+                      gRotate(ease(25, -90), 0, 0, 1); // Rotation
+                    },
+                  },
+                  {
+                    start: keyFrames[2],
+                    end: keyFrames[3],
+                    animation: (_, ease) => {
+                      gRotate(ease(40, 65), 1, 0, 0); // Flys
+                      gRotate(ease(-40, 35), 0, 1, 0); // Lat raises
+                      gRotate(ease(-90, 15), 0, 0, 1); // Rotation
+                    },
+                  },
+                ],
+                { showBefore: true }
+              );
             }
 
             // Don't touch
@@ -735,40 +751,51 @@ function render() {
                 // Forearm
                 newTaperedCylinder(textures.DEFAULT, () => {
                   if (isLeft) {
-                    newAnimation(keyFrames[0], keyFrames[1], {
-                      animations: (_, ease) => {
-                        gRotate(ease(80, 56.5), 1, 0, 0); // Bicep curls
+                    newAnimation([
+                      {
+                        start: keyFrames[0],
+                        end: keyFrames[1],
+                        animation: (_, ease) => {
+                          gRotate(ease(80, 56.5), 1, 0, 0); // Bicep curls
+                        },
                       },
-                    });
-                    newAnimation(keyFrames[1], keyFrames[2], {
-                      animations: (_, ease) => {
-                        gRotate(ease(56.5, 85), 1, 0, 0); // Bicep curls
+                      {
+                        start: keyFrames[1],
+                        end: keyFrames[2],
+                        animation: (_, ease) => {
+                          gRotate(ease(56.5, 85), 1, 0, 0); // Bicep curls
+                        },
                       },
-                    });
-                    newAnimation(keyFrames[2], keyFrames[3], {
-                      animations: () => {
-                        gRotate(85, 1, 0, 0); // Bicep curls
+                      {
+                        start: keyFrames[3],
+                        end: keyFrames[4],
+                        animation: (_, ease) => {
+                          gRotate(ease(85, 130), 1, 0, 0); // Bicep curls
+                        },
                       },
-                    });
-                    newAnimation(keyFrames[3], keyFrames[4], {
-                      animations: (_, ease) => {
-                        gRotate(ease(85, 130), 1, 0, 0); // Bicep curls
-                      },
-                      showAfter: true,
-                    });
+                    ]);
                   } else {
-                    newAnimation(keyFrames[1], keyFrames[2], {
-                      showBefore: true,
-                      animations: (_, ease) => {
-                        gRotate(ease(80, 100), 1, 0, 0); // Bicep curls
-                      },
-                    });
-                    newAnimation(keyFrames[2], keyFrames[3], {
-                      animations: (_, ease) => {
-                        gRotate(ease(100, 70), 1, 0, 0); // Bicep curls
-                      },
-                      showAfter: true,
-                    });
+                    newAnimation(
+                      [
+                        {
+                          start: keyFrames[1],
+                          end: keyFrames[2],
+                          animation: (_, ease) => {
+                            gRotate(ease(80, 100), 1, 0, 0); // Bicep curls
+                          },
+                        },
+                        {
+                          start: keyFrames[2],
+                          end: keyFrames[3],
+                          animation: (_, ease) => {
+                            gRotate(ease(100, 70), 1, 0, 0); // Bicep curls
+                          },
+                        },
+                      ],
+                      {
+                        showBefore: true,
+                      }
+                    );
                   }
 
                   gTranslate(0, 0, 0.5);
@@ -778,63 +805,65 @@ function render() {
                     gTranslate(0, 0, 0.5);
 
                     if (isLeft) {
-                      newAnimation(keyFrames[0], keyFrames[1], {
-                        showBefore: true,
-                        animations: () => {
-                          gRotate(180, 0, 0, 1);
+                      newAnimation([
+                        {
+                          start: keyFrames[0],
+                          end: keyFrames[1],
+                          animation: () => {
+                            gRotate(180, 0, 0, 1);
+                          },
                         },
-                      });
-                      newAnimation(keyFrames[1], keyFrames[2], {
-                        animations: (_, ease) => {
-                          gRotate(ease(180, 90), 0, 0, 1);
-                          newObj(() => {
-                            gScaleU(2);
-                            gRotate(-20, 0, 1, 0);
-                            newCoconut(0, 0, 1.25).draw();
-                          });
+                        {
+                          start: keyFrames[1],
+                          end: keyFrames[2],
+                          animation: (_, ease) => {
+                            gRotate(ease(180, 90), 0, 0, 1);
+                            newObj(() => {
+                              gScaleU(2);
+                              gRotate(-20, 0, 1, 0);
+                              newCoconut(0, 0, 1.25).draw();
+                            });
+                          },
                         },
-                      });
-                      newAnimation(keyFrames[2], keyFrames[3], {
-                        animations: () => {
-                          gRotate(90, 0, 0, 1);
-                          newObj(() => {
-                            gScaleU(2);
-                            gRotate(-20, 0, 1, 0);
-                            newCoconut(0, 0, 1.25).draw();
-                          });
+                        {
+                          start: keyFrames[3],
+                          end: keyFrames[4],
+                          animation: (_, ease) => {
+                            gRotate(ease(90, 120), 0, 0, 1);
+                            gRotate(ease(0, -25), 1, 0, 0);
+                            newObj(() => {
+                              gScaleU(2);
+                              gRotate(-20, 0, 1, 0);
+                              newCoconut(0, 0, 1.25).draw();
+                              drawStraw();
+                            });
+                          },
                         },
-                      });
-                      newAnimation(keyFrames[3], keyFrames[4], {
-                        animations: (_, ease) => {
-                          gRotate(ease(90, 120), 0, 0, 1);
-                          gRotate(ease(0, -25), 1, 0, 0);
-                          newObj(() => {
-                            gScaleU(2);
-                            gRotate(-20, 0, 1, 0);
-                            newCoconut(0, 0, 1.25).draw();
-                            drawStraw();
-                          });
-                        },
-                        showAfter: true,
-                      });
+                      ]);
                     } else {
-                      newAnimation(keyFrames[2], keyFrames[3], {
-                        animations: (lt) => {
-                          gRotate(-50, 0, 0, 1);
-                          gRotate(80, 0, 1, 0);
-                          gRotate(12, 1, 0, 0);
-                          newObj(() => {
-                            gScaleU(2);
-                            gRotate(180, 0, 1, 0);
-                            gRotate(50, 0, 0, 1);
-                            gTranslate(0.1, 0.15, -0.3);
-                            drawStraw();
-                          });
-                        },
-                      });
-                      newAnimation(keyFrames[3], keyFrames[4], {
-                        animations: () => {},
-                      });
+                      newAnimation(
+                        [
+                          {
+                            start: keyFrames[2],
+                            end: keyFrames[3],
+                            animation: () => {
+                              gRotate(-50, 0, 0, 1);
+                              gRotate(80, 0, 1, 0);
+                              gRotate(12, 1, 0, 0);
+                              newObj(() => {
+                                gScaleU(2);
+                                gRotate(180, 0, 1, 0);
+                                gRotate(50, 0, 0, 1);
+                                gTranslate(0.1, 0.15, -0.3);
+                                drawStraw();
+                              });
+                            },
+                          },
+                        ],
+                        {
+                          showAfter: false,
+                        }
+                      );
                     }
 
                     gScaleU(0.15);
