@@ -469,8 +469,8 @@ const keyFrames = [0, 0.85, 2, 3, 4];
 function render() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // const eye = vec3(-5, 6, 7);
-  const eye = vec3(-1, 4, 2);
+  const eye = vec3(-5, 6, 7);
+  // const eye = vec3(-1, 4, 2);
 
   // set the projection matrix
   u_projection = perspective(45, 1, near, far);
@@ -522,8 +522,15 @@ function render() {
 
   // Island
   newObj(() => {
-    newSphere(textures.SAND, () => {
+    newSphere(textures.GRASS, () => {
       gScale(5, 1, 5);
+    });
+    newSphere(textures.SAND, () => {
+      gTranslate(-1, 0, 0);
+      gScale(5, 0.97, 5);
+    });
+    newSphere(textures.SAND, () => {
+      gScale(5.5, 0.75, 5.5);
     });
   });
 
@@ -749,7 +756,7 @@ function render() {
                 gTranslate(0, 0, 0.25);
 
                 // Forearm
-                newTaperedCylinder(textures.DEFAULT, () => {
+                newTaperedCylinder(textures.SKIN, () => {
                   if (isLeft) {
                     newAnimation([
                       {

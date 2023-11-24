@@ -180,7 +180,7 @@ const setUniforms = () => {
  */
 
 /**
- * @typedef {Object} AnimationT
+ * @typedef {Object} AnimationElement
  * @property {number} start Start time
  * @property {number} end End time
  * @property {AnimationFunction} animation Animation function
@@ -194,7 +194,7 @@ const setUniforms = () => {
 
 /**
  *
- * @param {AnimationT[]} animations
+ * @param {AnimationElement[]} animations
  * @param {AnimationOptions} options
  */
 const newAnimation = (
