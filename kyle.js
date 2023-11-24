@@ -109,7 +109,7 @@ const getUniformLocation = (name) => {
 };
 
 /**
- *
+ * Recursively draw a shape
  * @param {TextureFile} texture Element of `textures` object
  * @param {number} count Number of recursive calls
  * @param {(texture: string, fn: () => void) => void} newShape Shape drawing function
@@ -151,7 +151,7 @@ const setUniformLocations = (p) => {
 };
 
 /**
- *
+ * Apply a shader
  * @param {Program} p Shader program to use
  * @param {() => void} fn Function with drawing commands
  */
@@ -172,23 +172,68 @@ const setUniforms = () => {
 };
 
 /**
- *
- * @param {number} start Start time
- * @param {number} duration Duration in seconds
- * @param {(localTime: number) => void} animation Animation function with "local time"
- * @returns
+ * @typedef {Object} Animations
+ * @property {boolean} showBefore Show static animations before
+ * @property {boolean} showAfter Show static animations after
+ * @property {(localTime: number, ease: any) => void} animations Animations to run
  */
-const newAnimation = (start, duration, animation, fixed = () => {}) => {
+
+/**
+ * Animate between two keyframes
+ * @param {number} start Start time
+ * @param {number} end End time
+ * @param {Animations} animations Animations object
+ */
+const newAnimation = (start, end, animations) => {
   const time = TIME % 30;
+  // const time = 3;
   const lt = time - start;
-  if (time >= start && time <= start + duration) animation(lt, lt / duration);
-  else fixed();
+  const duration = end - start;
+  const status = {
+    before: time < start,
+    during: time >= start && time <= end,
+    after: time > end,
+  };
+  const easeGen = (x) => (s, e) => newEase(x, s, e);
+  if (status.before && animations.showBefore)
+    animations.animations(0, easeGen(0));
+  else if (status.during) animations.animations(lt, easeGen(lt / duration));
+  else if (status.after && animations.showAfter)
+    animations.animations(duration, easeGen(1));
 };
 
-const ease = (x, start, end) =>
+/**
+ * Ease between two numbers
+ * @param {number} x Normalized progress in [0,1]
+ * @param {number} start Value when x = 0
+ * @param {number} end Value when x = 1
+ * @returns Number in range from `start` to `end`
+ */
+const newEase = (x, start, end) =>
   end + ((start - end) * (Math.cos(Math.PI * x) + 1)) / 2;
 
 //------------------- Objects ------------------
+
+const drawStraw = (t = textures.RUST) => {
+  newObj(() => {
+    gRotate(90, 1, 0, 0);
+    gRotate(-60, 0, 1, 0);
+    newCylinder(t, () => {
+      gTranslate(0.11, 0.22, 0.2);
+      newSphere(t, () => {
+        gTranslate(0, 0, 0.11);
+        gRotate(-90, 0, 0, 1);
+        newCylinder(t, () => {
+          gRotate(45, 1, 0, 0);
+          gTranslate(0, 0, 0.09);
+          gScale(0.03, 0.03, 0.15);
+        });
+        gScaleU(0.02);
+      });
+      gScale(0.03, 0.03, 0.25);
+    });
+  });
+};
 
 const newCoconut = (initX, initY, initZ) => ({
   offsets: {
