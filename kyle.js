@@ -216,7 +216,7 @@ const newAnimation = (
   animations,
   { showBefore = false, showAfter = true } = {}
 ) => {
-  const startAt = 24;
+  const startAt = 0;
   const slowDown = 1;
 
   animations.forEach(({ start, end, animation }, i) => {
