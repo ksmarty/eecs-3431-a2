@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "zip": "zip kyle-schwartz.zip textures Common kyle.js main.html main.js objects.js README.txt -r0"
+    "zip": "zip eecs3431_assignment_2.zip textures Common kyle.js main.html main.js objects.js README.txt -r0"
   },
   "devDependencies": {
     "vite": "^4.4.5"
