@@ -97,9 +97,11 @@ const useTexture = (texture) => {
   // Diffuse / Colour texture
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, loadedTextures[n].DIF.textureWebGL);
+  gl.uniform1i(getUniformLocation("texture_diffuse"), 0);
   // Normal map
   gl.activeTexture(gl.TEXTURE1);
   gl.bindTexture(gl.TEXTURE_2D, loadedTextures[n].NRM.textureWebGL);
+  gl.uniform1i(getUniformLocation("texture_normal"), 1);
 };
 
 /**
@@ -150,6 +152,7 @@ const setUniformLocations = (p) => {
   p.u_viewLoc = getUniformLocation("u_view");
   p.u_normalLoc = getUniformLocation("u_normal");
   p.u_projectionLoc = getUniformLocation("u_projection");
+  p.u_lightDir = getUniformLocation("u_lightDir");
 };
 
 /**
@@ -216,7 +219,7 @@ const newAnimation = (
   animations,
   { showBefore = false, showAfter = true } = {}
 ) => {
-  const startAt = 0;
+  const startAt = 15;
   const slowDown = 1;
 
   animations.forEach(({ start, end, animation }, i) => {

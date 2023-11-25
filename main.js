@@ -37,14 +37,7 @@ const Programs = { Default: {}, Water: {} };
 const near = 1;
 const far = 100;
 
-// Ortho consts
-// const left = -6.0;
-// const right = 6.0;
-// const ytop = 6.0;
-// const bottom = -6.0;
-
-// const lightPosition2 = vec4(100.0, 100.0, 100.0, 1.0);
-const lightPosition = vec4(0.0, 0.0, 100.0, 1.0);
+const lightPosition = vec4(0.0, 2.0, 0.0, 1.0);
 
 const defaultLight = {
   ambient: vec4(0.2, 0.2, 0.2, 1.0),
