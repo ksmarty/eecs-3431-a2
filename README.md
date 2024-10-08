@@ -1,5 +1,11 @@
 # EECS 3431 - Assignment 2
 
+
+
+https://github.com/user-attachments/assets/289544dc-10be-43a9-b2c4-8dd4ca6d90e2
+
+
+
 ## Work Done
 
 I implemented all of the required elements.
